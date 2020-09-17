@@ -3,7 +3,7 @@ import { EMAIL_USERNAME } from "../config";
 import { mailer } from "../mailer";
 import { ApiHealth } from "../models";
 
-const onWriteApiHealthPing = functions.firestore.document("api/health").onWrite(async (change) => {
+const onWriteBotIsAlive = functions.firestore.document("bots/{botId}").onWrite(async (change) => {
   if (change.after.exists) {
     const { isAlive } = change.after.data() as ApiHealth;
 
@@ -17,4 +17,4 @@ const onWriteApiHealthPing = functions.firestore.document("api/health").onWrite(
   }
 });
 
-export { onWriteApiHealthPing };
+export { onWriteBotIsAlive };

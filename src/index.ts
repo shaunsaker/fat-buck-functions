@@ -1,1 +1,1 @@
-export * from "./onWriteApiHealthPing";
+export * from "./onWriteBotIsAlive";
