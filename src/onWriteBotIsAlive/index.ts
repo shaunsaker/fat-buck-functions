@@ -5,9 +5,10 @@ import { ApiHealth } from "../models";
 
 const onWriteBotIsAlive = functions.firestore.document("bots/{botId}").onWrite(async (change) => {
   if (change.after.exists) {
-    const { isAlive } = change.after.data() as ApiHealth;
+    const { isAlive: isAliveBefore } = change.before.data() as ApiHealth;
+    const { isAlive: isAliveAfter } = change.after.data() as ApiHealth;
 
-    if (!isAlive) {
+    if (isAliveBefore && !isAliveAfter) {
       await mailer({
         to: EMAIL_USERNAME,
         subject: "BOT API DOWN",
