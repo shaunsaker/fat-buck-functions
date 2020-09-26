@@ -9,9 +9,11 @@ const onWriteBotIsAlive = functions.firestore.document("bots/{botId}").onWrite(a
     const { isAlive: isAliveAfter } = change.after.data() as ApiHealth;
 
     if (isAliveBefore && !isAliveAfter) {
+      const botId = change.after.id;
+
       await mailer({
         to: EMAIL_USERNAME,
-        subject: "BOT API DOWN",
+        subject: `${botId} is down!`,
         text: "The Bot's REST API is down.",
       });
     }
