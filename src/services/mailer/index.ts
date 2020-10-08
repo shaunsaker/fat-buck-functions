@@ -1,6 +1,6 @@
 import * as nodemailer from "nodemailer";
 import * as cors from "cors";
-import { EMAIL_PASSWORD, EMAIL_USERNAME } from "./config";
+import { EMAIL_PASSWORD, EMAIL_USERNAME } from "../../config";
 
 cors({ origin: true });
 
