@@ -1,11 +1,11 @@
-import * as nodemailer from "nodemailer";
-import * as cors from "cors";
-import { EMAIL_PASSWORD, EMAIL_USERNAME } from "../../config";
+import * as nodemailer from 'nodemailer';
+import * as cors from 'cors';
+import { EMAIL_PASSWORD, EMAIL_USERNAME } from '../../config';
 
 cors({ origin: true });
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: 'gmail',
   auth: {
     user: EMAIL_USERNAME,
     pass: EMAIL_PASSWORD,
@@ -18,7 +18,11 @@ interface MailerOptions {
   text: string;
 }
 
-export const mailer = async ({ to, subject, text }: MailerOptions) => {
+export const mailer = async ({
+  to,
+  subject,
+  text,
+}: MailerOptions): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const mailOptions = {
       from: `Fat Buck Functions <${EMAIL_USERNAME}>`,
@@ -27,12 +31,12 @@ export const mailer = async ({ to, subject, text }: MailerOptions) => {
       text,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, (error) => {
       if (error) {
         console.log(error);
         reject(error);
       }
-      console.log("Email sent successfully.");
+      console.log('Email sent successfully.');
       resolve(true);
     });
   });
