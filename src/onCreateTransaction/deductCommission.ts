@@ -3,7 +3,7 @@ import { toBTCDigits } from '../utils/toBTCDigits';
 // returns commission and new amount to 8 decimal places
 export const deductCommission = (
   amount: number,
-  commissionPercentage: number,
+  commissionPercentage = 2.5,
 ): {
   commission: number;
   newAmount: number;

@@ -35,4 +35,5 @@ export interface UserData {
 
 export interface PoolBalanceData {
   amount: number;
+  lastUpdated: string;
 }
