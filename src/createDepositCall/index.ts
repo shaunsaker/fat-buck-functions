@@ -4,7 +4,7 @@ import { getDate } from '../utils/getDate';
 import { DepositData, DepositStatus, OnCallDepositResponse } from './models';
 
 // creates a new deposit call
-export const onCallDeposit = functions.https.onCall(
+export const createDepositCall = functions.https.onCall(
   async (data, context): Promise<OnCallDepositResponse> => {
     const uid = context.auth?.uid;
 
