@@ -1,11 +1,16 @@
 import * as functions from 'firebase-functions';
 import { admin } from '../admin';
 import { getDate } from '../utils/getDate';
-import { DepositData, DepositStatus, OnCallDepositResponse } from './models';
+import {
+  DepositData,
+  DepositStatus,
+  CallDepositResponse,
+  CallDepositArgs,
+} from './models';
 
 // creates a new deposit call
 export const createDepositCall = functions.https.onCall(
-  async (data, context): Promise<OnCallDepositResponse> => {
+  async (data: CallDepositArgs, context): Promise<CallDepositResponse> => {
     const uid = context.auth?.uid;
 
     if (!uid) {

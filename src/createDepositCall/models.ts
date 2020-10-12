@@ -1,6 +1,6 @@
 export enum DepositStatus {
-  PENDING = "PENDING",
-  SUCCESS = "SUCCESS",
+  PENDING = 'PENDING',
+  SUCCESS = 'SUCCESS',
 }
 
 export interface DepositData {
@@ -13,7 +13,11 @@ export interface DepositData {
   message?: string; // used for errors
 }
 
-export interface OnCallDepositResponse {
+export interface CallDepositArgs {
+  walletAddress: string;
+}
+
+export interface CallDepositResponse {
   success?: boolean;
   error?: boolean;
   message?: string;
