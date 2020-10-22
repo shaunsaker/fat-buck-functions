@@ -5,7 +5,7 @@ import { deductCommission } from './deductCommission';
 import {
   CommissionTransactionData,
   DepositTransactionData,
-  PoolBalanceData,
+  PoolCommissionData,
   TransactionData,
   TransactionType,
   UserData,
@@ -18,8 +18,8 @@ export const handleDeposit = async ({
   onSaveCommission,
   currentUserBalance,
   onUpdateUserBalance,
-  currentPoolBalance,
-  onUpdatePoolBalance,
+  currentPoolCommission,
+  onUpdatePoolCommission,
 }: {
   data: DepositTransactionData;
   transactionId: string;
@@ -27,8 +27,8 @@ export const handleDeposit = async ({
   onSaveCommission: (commissionData: CommissionTransactionData) => void;
   currentUserBalance: number;
   onUpdateUserBalance: (uid: string, userData: UserData) => void;
-  currentPoolBalance: number;
-  onUpdatePoolBalance: (poolBalanceData: PoolBalanceData) => void;
+  currentPoolCommission: number;
+  onUpdatePoolCommission: (PoolCommissionData: PoolCommissionData) => void;
 }): Promise<null> => {
   const { amount, uid } = data;
   const { newAmount, commission } = deductCommission(amount);
@@ -54,13 +54,13 @@ export const handleDeposit = async ({
   await onUpdateUserBalance(data.uid, userData);
 
   // update the pool balance
-  const newPoolBalance = currentPoolBalance + newAmount + commission;
-  const poolBalanceData: PoolBalanceData = {
+  const newPoolBalance = currentPoolCommission + commission;
+  const PoolCommissionData: PoolCommissionData = {
     amount: newPoolBalance,
     lastUpdated: date,
   };
 
-  await onUpdatePoolBalance(poolBalanceData);
+  await onUpdatePoolCommission(PoolCommissionData);
 
   return null;
 };
@@ -74,12 +74,12 @@ export const getCurrentUserBalance = async (uid: string): Promise<number> => {
   return currentUserBalance;
 };
 
-export const getCurrentPoolBalance = async (): Promise<number> => {
-  const { amount: currentPoolBalance } = (await (
-    await admin.firestore().collection('pool').doc('balance').get()
-  ).data()) as PoolBalanceData;
+export const getCurrentPoolCommission = async (): Promise<number> => {
+  const { amount: currentPoolCommission } = (await (
+    await admin.firestore().collection('pool').doc('commission').get()
+  ).data()) as PoolCommissionData;
 
-  return currentPoolBalance;
+  return currentPoolCommission;
 };
 
 export const saveCommission = async (
@@ -101,15 +101,15 @@ export const updateUserBalance = async (
   return null;
 };
 
-export const updatePoolBalance = async (
-  poolBalanceData: PoolBalanceData,
+export const updatePoolCommission = async (
+  PoolCommissionData: PoolCommissionData,
 ): Promise<null> => {
-  console.log('Updating pool balance.');
+  console.log('Updating pool commission.');
   await admin
     .firestore()
     .collection('pool')
-    .doc('balance')
-    .update(poolBalanceData);
+    .doc('commission')
+    .update(PoolCommissionData);
 
   return null;
 };
@@ -120,7 +120,7 @@ export const processDeposit = async (
 ): Promise<null> => {
   const date = getDate();
   const currentUserBalance = await getCurrentUserBalance(data.uid);
-  const currentPoolBalance = await getCurrentPoolBalance();
+  const currentPoolCommission = await getCurrentPoolCommission();
 
   await handleDeposit({
     transactionId,
@@ -129,8 +129,8 @@ export const processDeposit = async (
     onSaveCommission: saveCommission,
     currentUserBalance,
     onUpdateUserBalance: updateUserBalance,
-    currentPoolBalance,
-    onUpdatePoolBalance: updatePoolBalance,
+    currentPoolCommission,
+    onUpdatePoolCommission: updatePoolCommission,
   });
 
   return null;

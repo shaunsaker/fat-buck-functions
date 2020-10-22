@@ -31,7 +31,7 @@ export interface UserData {
   balanceLastUpdated: string;
 }
 
-export interface PoolBalanceData {
+export interface PoolCommissionData {
   amount: number;
   lastUpdated: string;
 }

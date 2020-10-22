@@ -15,7 +15,5 @@ export const onCreateTransaction = functions.firestore
 
     // TODO: process withdrawal
 
-    // TODO: process commission?
-
     // TODO: process X
   });

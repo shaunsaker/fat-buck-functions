@@ -4,7 +4,7 @@ import { deductCommission } from './deductCommission';
 import {
   CommissionTransactionData,
   DepositTransactionData,
-  PoolBalanceData,
+  PoolCommissionData,
   TransactionType,
   UserData,
 } from './models';
@@ -29,8 +29,8 @@ describe('processDeposit', () => {
       const onSaveCommission = jest.fn();
       const currentUserBalance = 0;
       const onUpdateUserBalance = jest.fn();
-      const currentPoolBalance = 0;
-      const onUpdatePoolBalance = jest.fn();
+      const currentPoolCommission = 0;
+      const onUpdatePoolCommission = jest.fn();
 
       await handleDeposit({
         data,
@@ -39,8 +39,8 @@ describe('processDeposit', () => {
         onSaveCommission,
         currentUserBalance,
         onUpdateUserBalance,
-        currentPoolBalance,
-        onUpdatePoolBalance,
+        currentPoolCommission,
+        onUpdatePoolCommission,
       });
 
       const { commission, newAmount } = deductCommission(depositAmount);
@@ -57,8 +57,8 @@ describe('processDeposit', () => {
         balanceLastUpdated: date,
       };
 
-      const expectedPoolBalanceData: PoolBalanceData = {
-        amount: currentPoolBalance + newAmount + commission,
+      const expectedPoolCommissionData: PoolCommissionData = {
+        amount: currentPoolCommission + commission,
         lastUpdated: date,
       };
 
@@ -67,7 +67,9 @@ describe('processDeposit', () => {
         data.uid,
         expectedUserData,
       );
-      expect(onUpdatePoolBalance).toHaveBeenCalledWith(expectedPoolBalanceData);
+      expect(onUpdatePoolCommission).toHaveBeenCalledWith(
+        expectedPoolCommissionData,
+      );
     });
   });
 });
