@@ -12,4 +12,10 @@ export const onCreateTransaction = functions.firestore
     if (data.type === TransactionType.DEPOSIT) {
       await processDeposit(transactionId, data);
     }
+
+    // TODO: process withdrawal
+
+    // TODO: process commission?
+
+    // TODO: process X
   });

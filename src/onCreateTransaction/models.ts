@@ -13,10 +13,8 @@ export interface BaseTransactionData {
 export interface DepositTransactionData extends BaseTransactionData {
   uid: string;
   walletAddress: string;
-  depositId: string;
+  depositCallId: string;
   binanceTransactionId: string;
-  date: string;
-  amount: number;
 }
 
 export interface CommissionTransactionData extends BaseTransactionData {

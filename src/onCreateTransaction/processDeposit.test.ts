@@ -19,7 +19,7 @@ describe('processDeposit', () => {
         type: TransactionType.DEPOSIT,
         uid,
         walletAddress: getUniqueId(),
-        depositId: getUniqueId(),
+        depositCallId: getUniqueId(),
         binanceTransactionId: getUniqueId(),
         date: '',
         amount: depositAmount,
@@ -58,7 +58,7 @@ describe('processDeposit', () => {
       };
 
       const expectedPoolBalanceData: PoolBalanceData = {
-        amount: currentPoolBalance + commission,
+        amount: currentPoolBalance + newAmount + commission,
         lastUpdated: date,
       };
 

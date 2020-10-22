@@ -53,8 +53,8 @@ export const handleDeposit = async ({
 
   await onUpdateUserBalance(data.uid, userData);
 
-  // update the admin balance
-  const newPoolBalance = currentPoolBalance + commission;
+  // update the pool balance
+  const newPoolBalance = currentPoolBalance + newAmount + commission;
   const poolBalanceData: PoolBalanceData = {
     amount: newPoolBalance,
     lastUpdated: date,
