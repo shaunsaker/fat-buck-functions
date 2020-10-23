@@ -1,4 +1,4 @@
-import { admin } from '../admin';
+import { firebase } from '../../services/firebase';
 import { getDate } from '../../utils/getDate';
 import {
   PoolBalanceData,
@@ -47,14 +47,14 @@ export const handleTrade = async ({
 
 export const getPoolBalance = async (): Promise<number> => {
   const { amount: poolBalance } = (await (
-    await admin.firestore().collection('pool').doc('balance').get()
+    await firebase.firestore().collection('pool').doc('balance').get()
   ).data()) as PoolBalanceData;
 
   return poolBalance;
 };
 
 export const getTransactions = async (): Promise<TransactionData[]> => {
-  return (await admin.firestore().collection('transactions').get()).docs.map(
+  return (await firebase.firestore().collection('transactions').get()).docs.map(
     (doc) => {
       return {
         ...(doc.data() as TransactionData),
@@ -68,7 +68,7 @@ export const updatePoolProfit = async (
   poolProfitData: PoolProfitData,
 ): Promise<null> => {
   console.log('Updating pool profit.');
-  await admin
+  await firebase
     .firestore()
     .collection('pool')
     .doc('profit')

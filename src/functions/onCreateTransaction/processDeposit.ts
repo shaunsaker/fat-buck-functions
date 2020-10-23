@@ -1,4 +1,4 @@
-import { admin } from '../admin';
+import { firebase } from '../../services/firebase';
 import { getDate } from '../../utils/getDate';
 import { toBTCDigits } from '../../utils/toBTCDigits';
 import { deductCommission } from './deductCommission';
@@ -67,7 +67,7 @@ export const handleDeposit = async ({
 export const getUserBalance = async (uid: string): Promise<number> => {
   const initialUserBalance = toBTCDigits(0);
   const { balance: userBalance = initialUserBalance } = (await (
-    await admin.firestore().collection('users').doc(uid).get()
+    await firebase.firestore().collection('users').doc(uid).get()
   ).data()) as UserData;
 
   return userBalance;
@@ -75,7 +75,7 @@ export const getUserBalance = async (uid: string): Promise<number> => {
 
 export const getPoolCommission = async (): Promise<number> => {
   const { amount: poolCommission } = (await (
-    await admin.firestore().collection('pool').doc('commission').get()
+    await firebase.firestore().collection('pool').doc('commission').get()
   ).data()) as PoolCommissionData;
 
   return poolCommission;
@@ -85,7 +85,11 @@ export const saveCommission = async (
   commissionData: CommissionTransactionData,
 ): Promise<null> => {
   console.log('Saving commission transaction.');
-  await admin.firestore().collection('transactions').doc().set(commissionData);
+  await firebase
+    .firestore()
+    .collection('transactions')
+    .doc()
+    .set(commissionData);
 
   return null;
 };
@@ -95,7 +99,7 @@ export const updateUserBalance = async (
   userData: UserData,
 ): Promise<null> => {
   console.log('Updating user balance.');
-  await admin.firestore().collection('users').doc(uid).update(userData);
+  await firebase.firestore().collection('users').doc(uid).update(userData);
 
   return null;
 };
@@ -104,7 +108,7 @@ export const updatePoolCommission = async (
   poolCommissionData: PoolCommissionData,
 ): Promise<null> => {
   console.log('Updating pool commission.');
-  await admin
+  await firebase
     .firestore()
     .collection('pool')
     .doc('commission')

@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions';
-import { EMAIL_USERNAME } from '../../config';
 import { mailer } from '../../services/mailer';
 import { BotData } from './models';
 
@@ -14,7 +13,7 @@ export const onWriteBotIsAlive = functions.firestore
         const botId = change.after.id;
 
         await mailer({
-          to: EMAIL_USERNAME,
+          to: process.env.EMAIL_USERNAME,
           subject: `${botId} is down!`,
           text: "The Bot's REST API is down.",
         });

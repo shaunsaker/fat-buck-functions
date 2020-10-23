@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import { admin } from '../admin';
+import { firebase } from '../../services/firebase';
 import { getDate } from '../../utils/getDate';
 import {
   DepositData,
@@ -30,7 +30,11 @@ export const createDepositCall = functions.https.onCall(
       status: DepositStatus.PENDING,
     };
 
-    await admin.firestore().collection('depositCalls').doc().set(depositData);
+    await firebase
+      .firestore()
+      .collection('depositCalls')
+      .doc()
+      .set(depositData);
 
     return {
       success: true,
