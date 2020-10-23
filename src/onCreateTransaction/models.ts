@@ -2,6 +2,7 @@ export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
   WITHDRAWAL = 'WITHDRAWAL',
   COMMISSION = 'COMMISSION',
+  TRADE = 'TRADE',
 }
 
 export interface BaseTransactionData {
@@ -22,9 +23,14 @@ export interface CommissionTransactionData extends BaseTransactionData {
   uid: string; // used to filter a users own transactions
 }
 
+export interface TradeTransactionData extends BaseTransactionData {
+  tradeId: string;
+}
+
 export type TransactionData =
   | DepositTransactionData
-  | CommissionTransactionData; // TODO: or withdrawal etc
+  | CommissionTransactionData
+  | TradeTransactionData; // TODO: or withdrawal etc
 
 export interface UserData {
   balance: number;
@@ -32,6 +38,16 @@ export interface UserData {
 }
 
 export interface PoolCommissionData {
+  amount: number;
+  lastUpdated: string;
+}
+
+export interface PoolBalanceData {
+  amount: number;
+  lastUpdated: string;
+}
+
+export interface PoolProfitData {
   amount: number;
   lastUpdated: string;
 }

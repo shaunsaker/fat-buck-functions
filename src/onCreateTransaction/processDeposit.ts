@@ -6,7 +6,6 @@ import {
   CommissionTransactionData,
   DepositTransactionData,
   PoolCommissionData,
-  TransactionData,
   TransactionType,
   UserData,
 } from './models';
@@ -16,19 +15,19 @@ export const handleDeposit = async ({
   data,
   date,
   onSaveCommission,
-  currentUserBalance,
+  userBalance,
   onUpdateUserBalance,
-  currentPoolCommission,
+  poolCommission,
   onUpdatePoolCommission,
 }: {
-  data: DepositTransactionData;
   transactionId: string;
+  data: DepositTransactionData;
   date: string;
   onSaveCommission: (commissionData: CommissionTransactionData) => void;
-  currentUserBalance: number;
+  userBalance: number;
   onUpdateUserBalance: (uid: string, userData: UserData) => void;
-  currentPoolCommission: number;
-  onUpdatePoolCommission: (PoolCommissionData: PoolCommissionData) => void;
+  poolCommission: number;
+  onUpdatePoolCommission: (poolCommissionData: PoolCommissionData) => void;
 }): Promise<null> => {
   const { amount, uid } = data;
   const { newAmount, commission } = deductCommission(amount);
@@ -45,7 +44,7 @@ export const handleDeposit = async ({
   await onSaveCommission(commissionData);
 
   // update the user's balance
-  const newUserBalance = toBTCDigits(currentUserBalance + newAmount);
+  const newUserBalance = toBTCDigits(userBalance + newAmount);
   const userData: UserData = {
     balance: newUserBalance,
     balanceLastUpdated: date,
@@ -54,32 +53,32 @@ export const handleDeposit = async ({
   await onUpdateUserBalance(data.uid, userData);
 
   // update the pool balance
-  const newPoolBalance = currentPoolCommission + commission;
-  const PoolCommissionData: PoolCommissionData = {
+  const newPoolBalance = poolCommission + commission;
+  const poolCommissionData: PoolCommissionData = {
     amount: newPoolBalance,
     lastUpdated: date,
   };
 
-  await onUpdatePoolCommission(PoolCommissionData);
+  await onUpdatePoolCommission(poolCommissionData);
 
   return null;
 };
 
-export const getCurrentUserBalance = async (uid: string): Promise<number> => {
+export const getUserBalance = async (uid: string): Promise<number> => {
   const initialUserBalance = toBTCDigits(0);
-  const { balance: currentUserBalance = initialUserBalance } = (await (
+  const { balance: userBalance = initialUserBalance } = (await (
     await admin.firestore().collection('users').doc(uid).get()
   ).data()) as UserData;
 
-  return currentUserBalance;
+  return userBalance;
 };
 
-export const getCurrentPoolCommission = async (): Promise<number> => {
-  const { amount: currentPoolCommission } = (await (
+export const getPoolCommission = async (): Promise<number> => {
+  const { amount: poolCommission } = (await (
     await admin.firestore().collection('pool').doc('commission').get()
   ).data()) as PoolCommissionData;
 
-  return currentPoolCommission;
+  return poolCommission;
 };
 
 export const saveCommission = async (
@@ -102,34 +101,34 @@ export const updateUserBalance = async (
 };
 
 export const updatePoolCommission = async (
-  PoolCommissionData: PoolCommissionData,
+  poolCommissionData: PoolCommissionData,
 ): Promise<null> => {
   console.log('Updating pool commission.');
   await admin
     .firestore()
     .collection('pool')
     .doc('commission')
-    .update(PoolCommissionData);
+    .update(poolCommissionData);
 
   return null;
 };
 
 export const processDeposit = async (
   transactionId: string,
-  data: TransactionData,
+  data: DepositTransactionData,
 ): Promise<null> => {
   const date = getDate();
-  const currentUserBalance = await getCurrentUserBalance(data.uid);
-  const currentPoolCommission = await getCurrentPoolCommission();
+  const userBalance = await getUserBalance(data.uid);
+  const poolCommission = await getPoolCommission();
 
   await handleDeposit({
     transactionId,
-    data: data as DepositTransactionData,
+    data,
     date,
     onSaveCommission: saveCommission,
-    currentUserBalance,
+    userBalance,
     onUpdateUserBalance: updateUserBalance,
-    currentPoolCommission,
+    poolCommission,
     onUpdatePoolCommission: updatePoolCommission,
   });
 
