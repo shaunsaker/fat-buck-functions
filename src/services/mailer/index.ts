@@ -1,14 +1,13 @@
 import * as nodemailer from 'nodemailer';
 import * as cors from 'cors';
-import { EMAIL_PASSWORD, EMAIL_USERNAME } from '../../config';
 
 cors({ origin: true });
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: EMAIL_USERNAME,
-    pass: EMAIL_PASSWORD,
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
@@ -25,7 +24,7 @@ export const mailer = async ({
 }: MailerOptions): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const mailOptions = {
-      from: `Fat Buck Functions <${EMAIL_USERNAME}>`,
+      from: `Fat Buck Functions <${process.env.EMAIL_USERNAME}>`,
       to,
       subject,
       text,
