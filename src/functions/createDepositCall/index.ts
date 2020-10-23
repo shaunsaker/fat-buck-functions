@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { admin } from '../admin';
-import { getDate } from '../utils/getDate';
+import { getDate } from '../../utils/getDate';
 import {
   DepositData,
   DepositStatus,

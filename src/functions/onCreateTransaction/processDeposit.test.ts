@@ -1,5 +1,5 @@
-import { getDate } from '../utils/getDate';
-import { getUniqueId } from '../utils/getUniqueId';
+import { getDate } from '../../utils/getDate';
+import { getUniqueId } from '../../utils/getUniqueId';
 import { deductCommission } from './deductCommission';
 import {
   CommissionTransactionData,
@@ -27,9 +27,9 @@ describe('processDeposit', () => {
       const transactionId = getUniqueId();
       const date = getDate();
       const onSaveCommission = jest.fn();
-      const currentUserBalance = 0;
+      const userBalance = 0;
       const onUpdateUserBalance = jest.fn();
-      const currentPoolCommission = 0;
+      const poolCommission = 0;
       const onUpdatePoolCommission = jest.fn();
 
       await handleDeposit({
@@ -37,9 +37,9 @@ describe('processDeposit', () => {
         transactionId,
         date,
         onSaveCommission,
-        currentUserBalance,
+        userBalance,
         onUpdateUserBalance,
-        currentPoolCommission,
+        poolCommission,
         onUpdatePoolCommission,
       });
 
@@ -53,12 +53,12 @@ describe('processDeposit', () => {
       };
 
       const expectedUserData: UserData = {
-        balance: currentUserBalance + newAmount,
+        balance: userBalance + newAmount,
         balanceLastUpdated: date,
       };
 
       const expectedPoolCommissionData: PoolCommissionData = {
-        amount: currentPoolCommission + commission,
+        amount: poolCommission + commission,
         lastUpdated: date,
       };
 

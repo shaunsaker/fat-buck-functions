@@ -5,13 +5,15 @@
     "node": "10"
   },
   "scripts": {
-    "dev": "yarn ts-node-dev --respawn ./src",
-    "lint": "eslint . --ext .ts,.tsx",
+    "dev": "yarn ts-node-dev --respawn",
+    "lint": "yarn lint:eslint && yarn lint:tsc",
+    "lint:eslint": "eslint . --ext .ts,.tsx",
+    "lint:tsc": "yarn build",
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "tsc -p tsconfig.release.json",
-    "predeploy": "yarn lint && yarn test && yarn build",
-    "deploy": "firebase deploy --only functions"
+    "predeploy:functions": "yarn lint && yarn test && yarn build",
+    "deploy:functions": "firebase deploy --only functions"
   },
   "main": "build/src/index.js",
   "dependencies": {

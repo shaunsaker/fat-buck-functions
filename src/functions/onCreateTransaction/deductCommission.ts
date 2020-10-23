@@ -1,4 +1,4 @@
-import { toBTCDigits } from '../utils/toBTCDigits';
+import { toBTCDigits } from '../../utils/toBTCDigits';
 
 // returns commission and new amount to 8 decimal places
 export const deductCommission = (

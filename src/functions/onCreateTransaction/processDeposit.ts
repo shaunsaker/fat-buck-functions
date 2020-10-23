@@ -1,6 +1,6 @@
 import { admin } from '../admin';
-import { getDate } from '../utils/getDate';
-import { toBTCDigits } from '../utils/toBTCDigits';
+import { getDate } from '../../utils/getDate';
+import { toBTCDigits } from '../../utils/toBTCDigits';
 import { deductCommission } from './deductCommission';
 import {
   CommissionTransactionData,

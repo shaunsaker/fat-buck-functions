@@ -1,5 +1,5 @@
 import { admin } from '../admin';
-import { getDate } from '../utils/getDate';
+import { getDate } from '../../utils/getDate';
 import {
   PoolBalanceData,
   PoolProfitData,
@@ -9,8 +9,8 @@ import {
 } from './models';
 
 export const handleTrade = async ({
-  transactionId,
-  data,
+  // transactionId,
+  // data,
   date,
   poolBalance,
   transactions,
