@@ -5,21 +5,20 @@ import {
 } from '../../services/binance/models';
 import { getDepositCalls } from '../../services/firebase/getDepositCalls';
 import {
-  DepositData,
+  DepositCallData,
   DepositStatus,
   DepositTransactionData,
-  TransactionData,
   TransactionType,
 } from '../../services/firebase/models';
-import { saveDeposit } from '../../services/firebase/saveDeposit';
+import { saveDepositCall } from '../../services/firebase/saveDepositCall';
 import { saveTransaction } from '../../services/firebase/saveTransaction';
 import { getDate } from '../../utils/getDate';
 
 export const processDeposits = async (
   depositHistory: BinanceDepositList,
-  depositCalls: DepositData[],
-  onSaveTransaction: (transaction: TransactionData) => void,
-  onSaveDeposit: (deposit: DepositData) => void,
+  depositCalls: DepositCallData[],
+  onSaveTransaction: (transaction: DepositTransactionData) => void,
+  onSaveDepositCall: (deposit: DepositCallData, id: string) => void,
   date: string,
 ): Promise<null> => {
   // filter out the deposits in depositHistory that have already been resolved in depositCalls
@@ -47,27 +46,27 @@ export const processDeposits = async (
       continue;
     }
 
-    const newDepositCall = { ...depositCall };
+    const newDepositCallData = { ...depositCall };
 
     // if the status is pending or verifying, add the binanceTransactionId
     if (
       deposit.status === BinanceDepositStatus.pending ||
       deposit.status === BinanceDepositStatus.verifying
     ) {
-      newDepositCall.binanceTransactionId = deposit.txId;
+      newDepositCallData.binanceTransactionId = deposit.txId;
     }
 
     // if the status is success, update the deposit call and add the deposit to transactions
     else if (deposit.status === BinanceDepositStatus.success) {
       // check if the asset is BTC, if not don't process it but save it as an error
       if (deposit.asset !== 'BTC') {
-        newDepositCall.status = DepositStatus.ERROR;
-        newDepositCall.message = `We do not support ${deposit.asset} deposits. Your deposit will be returned to your wallet address, ${deposit.address}.`;
+        newDepositCallData.status = DepositStatus.ERROR;
+        newDepositCallData.message = `We do not support ${deposit.asset} deposits. Your deposit will be returned to your wallet address, ${deposit.address}.`;
 
         // TODO: withdraw to the user's address
       } else {
-        newDepositCall.resolvedDate = date;
-        newDepositCall.status = DepositStatus.SUCCESS;
+        newDepositCallData.resolvedDate = date;
+        newDepositCallData.status = DepositStatus.SUCCESS;
 
         // save the deposit to transactions
         const transaction: DepositTransactionData = {
@@ -90,7 +89,7 @@ export const processDeposits = async (
     }
 
     // save the updated deposit call
-    await onSaveDeposit(newDepositCall);
+    await onSaveDepositCall(newDepositCallData, newDepositCallData.id);
   }
 
   return null;
@@ -110,7 +109,7 @@ export const handleDeposits = async (): Promise<null> => {
     depositHistory,
     depositCalls,
     saveTransaction,
-    saveDeposit,
+    saveDepositCall,
     getDate(),
   );
 

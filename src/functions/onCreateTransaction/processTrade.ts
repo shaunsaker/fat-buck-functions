@@ -6,7 +6,7 @@ import {
   TradeTransactionData,
   TransactionData,
   TransactionType,
-} from './models';
+} from '../../services/firebase/models';
 
 export const handleTrade = async ({
   // transactionId,

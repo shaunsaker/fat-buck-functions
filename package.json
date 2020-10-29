@@ -17,7 +17,8 @@
     "predeploy:functions": "yarn lint && yarn test && yarn build",
     "deploy:functions": "firebase deploy --only functions",
     "predeploy:heroku": "yarn lint && yarn test && yarn build",
-    "deploy:heroku": "git push heroku master"
+    "deploy:heroku": "git push heroku master",
+    "deploy": "yarn deploy:functions && yarn deploy:heroku"
   },
   "main": "build/src/index.js",
   "dependencies": {

@@ -8,7 +8,7 @@ import {
   PoolCommissionData,
   TransactionType,
   UserData,
-} from './models';
+} from '../../services/firebase/models';
 
 export const handleDeposit = async ({
   transactionId,

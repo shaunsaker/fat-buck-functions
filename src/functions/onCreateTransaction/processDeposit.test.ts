@@ -7,7 +7,7 @@ import {
   PoolCommissionData,
   TransactionType,
   UserData,
-} from './models';
+} from '../../services/firebase/models';
 import { handleDeposit } from './processDeposit';
 
 describe('processDeposit', () => {

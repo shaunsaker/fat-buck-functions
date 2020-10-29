@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { mailer } from '../../services/mailer';
-import { BotData } from './models';
+import { BotData } from '../../services/firebase/models';
 
 export const onWriteBotIsAlive = functions.firestore
   .document('bots/{botId}')

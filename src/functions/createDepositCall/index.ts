@@ -1,12 +1,8 @@
 import * as functions from 'firebase-functions';
-import { firebase } from '../../services/firebase';
+import { saveDepositCall } from '../../services/firebase/saveDepositCall';
 import { getDate } from '../../utils/getDate';
-import {
-  DepositData,
-  DepositStatus,
-  CallDepositResponse,
-  CallDepositArgs,
-} from './models';
+import { DepositCallData, DepositStatus } from '../../services/firebase/models';
+import { CallDepositArgs, CallDepositResponse } from './models';
 
 // creates a new deposit call
 export const createDepositCall = functions.https.onCall(
@@ -23,18 +19,14 @@ export const createDepositCall = functions.https.onCall(
 
     // create a new deposit call
     const { walletAddress } = data;
-    const depositData: DepositData = {
+    const depositCallData: DepositCallData = {
       uid,
       date: getDate(),
       walletAddress,
       status: DepositStatus.PENDING,
     };
 
-    await firebase
-      .firestore()
-      .collection('depositCalls')
-      .doc()
-      .set(depositData);
+    await saveDepositCall(depositCallData);
 
     return {
       success: true,

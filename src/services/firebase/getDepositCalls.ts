@@ -1,12 +1,12 @@
 import { firebase } from '.';
-import { DepositData } from './models';
+import { DepositCallData } from './models';
 
-export const getDepositCalls = async (): Promise<DepositData[]> => {
+export const getDepositCalls = async (): Promise<DepositCallData[]> => {
   const depositCalls = await (
     await firebase.firestore().collection('depositCalls').get()
   ).docs.map((doc) => {
     return {
-      ...(doc.data() as DepositData),
+      ...(doc.data() as DepositCallData),
       id: doc.id,
     };
   });

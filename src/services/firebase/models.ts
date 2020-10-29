@@ -1,18 +1,11 @@
-export interface BotData {
-  id: string;
-  api: string;
-  isAlive: boolean;
-  isActive: boolean;
-}
-
 export enum DepositStatus {
   PENDING = 'PENDING',
   SUCCESS = 'SUCCESS',
   ERROR = 'ERROR',
 }
 
-export interface DepositData {
-  id: string;
+export interface DepositCallData {
+  id?: string;
   uid: string;
   date: string;
   walletAddress: string;
@@ -59,4 +52,27 @@ export type TransactionData =
 export interface PoolBalanceData {
   amount: number;
   lastUpdated: string;
+}
+
+export interface UserData {
+  balance: number;
+  balanceLastUpdated: string;
+}
+
+export interface PoolCommissionData {
+  amount: number;
+  lastUpdated: string;
+}
+
+export interface PoolProfitData {
+  amount: number;
+  lastUpdated: string;
+}
+
+export interface BotData {
+  id?: string;
+  api: string;
+  dateUpdated: string;
+  isActive: boolean;
+  isAlive: boolean;
 }

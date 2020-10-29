@@ -4,7 +4,7 @@ import {
   TradeTransactionData,
   TransactionData,
   TransactionType,
-} from './models';
+} from '../../services/firebase/models';
 import { processDeposit } from './processDeposit';
 import { processTrade } from './processTrade';
 

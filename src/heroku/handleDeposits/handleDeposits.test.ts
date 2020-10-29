@@ -5,7 +5,7 @@ import {
   BinanceDepositStatus,
 } from '../../services/binance/models';
 import {
-  DepositData,
+  DepositCallData,
   DepositStatus,
   DepositTransactionData,
   TransactionType,
@@ -42,7 +42,7 @@ const getDepositCall = (
   walletAddress?: string,
   binanceTransactionId?: string,
   hasSuccess?: boolean,
-): DepositData => {
+): DepositCallData => {
   return {
     id: getUniqueId(),
     uid: getUniqueId(),
@@ -69,7 +69,7 @@ describe('handleDeposits', () => {
 
   it('works when deposit history and deposit calls are empty', async () => {
     const depositHistory: BinanceDepositList = [];
-    const depositCalls: DepositData[] = [];
+    const depositCalls: DepositCallData[] = [];
 
     await processDeposits(
       depositHistory,
@@ -85,7 +85,7 @@ describe('handleDeposits', () => {
 
   it('works when deposit history is empty but there are deposit calls', async () => {
     const depositHistory: BinanceDepositList = [];
-    const depositCalls: DepositData[] = getRandomDepositCalls(5);
+    const depositCalls: DepositCallData[] = getRandomDepositCalls(5);
 
     await processDeposits(
       depositHistory,
@@ -107,7 +107,7 @@ describe('handleDeposits', () => {
       getDeposit(walletAddress, transactionId),
     ]);
     const depositCall = getDepositCall(walletAddress);
-    const depositCalls: DepositData[] = randomise([
+    const depositCalls: DepositCallData[] = randomise([
       ...getRandomDepositCalls(5),
       depositCall,
     ]);
@@ -120,7 +120,7 @@ describe('handleDeposits', () => {
       date,
     );
 
-    const expectedDeposit: DepositData = {
+    const expectedDeposit: DepositCallData = {
       ...depositCall,
       binanceTransactionId: transactionId,
     };
@@ -141,7 +141,7 @@ describe('handleDeposits', () => {
     ]);
     const depositCall1 = getDepositCall(walletAddress1);
     const depositCall2 = getDepositCall(walletAddress2);
-    const depositCalls: DepositData[] = randomise([
+    const depositCalls: DepositCallData[] = randomise([
       ...getRandomDepositCalls(5),
       depositCall1,
       depositCall2,
@@ -167,7 +167,7 @@ describe('handleDeposits', () => {
       getDeposit(walletAddress, transactionId, BinanceDepositStatus.verifying),
     ]);
     const depositCall = getDepositCall(walletAddress);
-    const depositCalls: DepositData[] = [
+    const depositCalls: DepositCallData[] = [
       ...getRandomDepositCalls(5),
       depositCall,
     ];
@@ -180,7 +180,7 @@ describe('handleDeposits', () => {
       date,
     );
 
-    const expectedDeposit: DepositData = {
+    const expectedDeposit: DepositCallData = {
       ...depositCall,
       binanceTransactionId: transactionId,
     };
@@ -202,7 +202,7 @@ describe('handleDeposits', () => {
       deposit,
     ]);
     const depositCall = getDepositCall(walletAddress, transactionId);
-    const depositCalls: DepositData[] = [
+    const depositCalls: DepositCallData[] = [
       ...getRandomDepositCalls(5),
       depositCall,
     ];
@@ -224,7 +224,7 @@ describe('handleDeposits', () => {
       amount: deposit.amount,
       type: TransactionType.DEPOSIT,
     };
-    const expectedDeposit: DepositData = {
+    const expectedDeposit: DepositCallData = {
       ...depositCall,
       status: DepositStatus.SUCCESS,
       resolvedDate: date,
@@ -246,7 +246,7 @@ describe('handleDeposits', () => {
     ]);
     const depositCall1 = getDepositCall(walletAddress1, transactionId1);
     const depositCall2 = getDepositCall(walletAddress2, transactionId2);
-    const depositCalls: DepositData[] = randomise([
+    const depositCalls: DepositCallData[] = randomise([
       ...getRandomDepositCalls(5),
       depositCall1,
       depositCall2,
@@ -277,7 +277,7 @@ describe('handleDeposits', () => {
       deposit,
     ]);
     const depositCall = getDepositCall(walletAddress, transactionId, true);
-    const depositCalls: DepositData[] = randomise([
+    const depositCalls: DepositCallData[] = randomise([
       ...getRandomDepositCalls(5),
       depositCall,
     ]);
@@ -306,7 +306,7 @@ describe('handleDeposits', () => {
       ...getRandomDeposits(5),
       deposit,
     ]);
-    const depositCalls: DepositData[] = [];
+    const depositCalls: DepositCallData[] = [];
 
     await processDeposits(
       depositHistory,
@@ -334,7 +334,7 @@ describe('handleDeposits', () => {
     ]);
     const anotherWalletAddress = getUniqueId();
     const depositCall = getDepositCall(anotherWalletAddress);
-    const depositCalls: DepositData[] = randomise([
+    const depositCalls: DepositCallData[] = randomise([
       ...getRandomDepositCalls(5),
       depositCall,
     ]);
@@ -366,7 +366,7 @@ describe('handleDeposits', () => {
       deposit,
     ]);
     const depositCall = getDepositCall(walletAddress, transactionId);
-    const depositCalls: DepositData[] = randomise([
+    const depositCalls: DepositCallData[] = randomise([
       ...getRandomDepositCalls(5),
       depositCall,
     ]);
@@ -379,7 +379,7 @@ describe('handleDeposits', () => {
       date,
     );
 
-    const expectedDeposit: DepositData = {
+    const expectedDeposit: DepositCallData = {
       ...depositCall,
       status: DepositStatus.ERROR,
       message: `We do not support ${notBTC} deposits. Your deposit will be returned to your wallet address, ${walletAddress}.`,
