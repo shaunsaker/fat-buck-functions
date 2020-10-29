@@ -1,5 +1,5 @@
-import { getExchangeRates } from '../services/exchangeRates/getExchangeRates';
-import { saveExchangeRates } from '../services/firebase/saveExchangeRates';
+import { getExchangeRates } from '../../services/exchangeRates/getExchangeRates';
+import { saveExchangeRates } from '../../services/firebase/saveExchangeRates';
 
 export const getExchangeData = async (): Promise<null> => {
   console.log('Getting exchange rates.');

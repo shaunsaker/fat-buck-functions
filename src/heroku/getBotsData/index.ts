@@ -1,12 +1,12 @@
-import { getAccessToken } from '../services/bots/getAccessToken';
-import { getBalance } from '../services/bots/getBalance';
-import { getIsAlive } from '../services/bots/getIsAlive';
-import { getOpenTrades } from '../services/bots/getOpenTrades';
-import { getTrades } from '../services/bots/getTrades';
-import { getActiveBots } from '../services/firebase/getActiveBots';
-import { saveBalance } from '../services/firebase/saveBalance';
-import { saveIsAlive } from '../services/firebase/saveIsAlive';
-import { saveTrades } from '../services/firebase/saveTrades';
+import { getAccessToken } from '../../services/bots/getAccessToken';
+import { getBalance } from '../../services/bots/getBalance';
+import { getIsAlive } from '../../services/bots/getIsAlive';
+import { getOpenTrades } from '../../services/bots/getOpenTrades';
+import { getTrades } from '../../services/bots/getTrades';
+import { getActiveBots } from '../../services/firebase/getActiveBots';
+import { saveBalance } from '../../services/firebase/saveBalance';
+import { saveIsAlive } from '../../services/firebase/saveIsAlive';
+import { saveTrades } from '../../services/firebase/saveTrades';
 
 export const getBotsData = async (): Promise<null> => {
   console.log('Getting active bots.');

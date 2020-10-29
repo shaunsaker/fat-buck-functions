@@ -1,18 +1,18 @@
-import { processDeposits } from './handleDeposits';
+import { processDeposits } from '../handleDeposits';
 import {
   BinanceDepositHistory,
   BinanceDepositList,
   BinanceDepositStatus,
-} from '../services/binance/models';
+} from '../../services/binance/models';
 import {
   DepositData,
   DepositStatus,
   DepositTransactionData,
   TransactionType,
-} from '../services/firebase/models';
-import { getDate } from '../utils/getDate';
-import { getUniqueId } from '../utils/getUniqueId';
-import { randomise } from '../utils/randomise';
+} from '../../services/firebase/models';
+import { getDate } from '../../utils/getDate';
+import { getUniqueId } from '../../utils/getUniqueId';
+import { randomise } from '../../utils/randomise';
 
 const getDeposit = (
   walletAddress: string,

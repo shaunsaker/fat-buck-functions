@@ -1,19 +1,19 @@
-import { getDepositHistory } from '../services/binance/getDepositHistory';
+import { getDepositHistory } from '../../services/binance/getDepositHistory';
 import {
   BinanceDepositList,
   BinanceDepositStatus,
-} from '../services/binance/models';
-import { getDepositCalls } from '../services/firebase/getDepositCalls';
+} from '../../services/binance/models';
+import { getDepositCalls } from '../../services/firebase/getDepositCalls';
 import {
   DepositData,
   DepositStatus,
   DepositTransactionData,
   TransactionData,
   TransactionType,
-} from '../services/firebase/models';
-import { saveDeposit } from '../services/firebase/saveDeposit';
-import { saveTransaction } from '../services/firebase/saveTransaction';
-import { getDate } from '../utils/getDate';
+} from '../../services/firebase/models';
+import { saveDeposit } from '../../services/firebase/saveDeposit';
+import { saveTransaction } from '../../services/firebase/saveTransaction';
+import { getDate } from '../../utils/getDate';
 
 export const processDeposits = async (
   depositHistory: BinanceDepositList,
