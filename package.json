@@ -6,7 +6,7 @@
     "node": "10"
   },
   "scripts": {
-    "postinstall": "npm run build && cp ./src/services/firebase/service-account.json ./build/src/services/firebase/service-account.json",
+    "postinstall": "if [[ ${ON_HEROKU} ]]; then (npm run build && cp ./src/services/firebase/service-account.json ./build/src/services/firebase/service-account.json); fi",
     "dev": "yarn ts-node-dev --respawn",
     "lint": "yarn lint:eslint && yarn lint:tsc",
     "lint:eslint": "eslint . --ext .ts,.tsx",
