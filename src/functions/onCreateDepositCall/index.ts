@@ -5,7 +5,7 @@ import { DepositCallData, DepositStatus } from '../../services/firebase/models';
 import { CallDepositArgs, CallDepositResponse } from './models';
 
 // creates a new deposit call
-export const createDepositCall = functions.https.onCall(
+export const onCreateDepositCall = functions.https.onCall(
   async (data: CallDepositArgs, context): Promise<CallDepositResponse> => {
     const uid = context.auth?.uid;
 
