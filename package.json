@@ -20,7 +20,7 @@
     "deploy:heroku": "git push heroku master",
     "deploy": "yarn deploy:functions && yarn deploy:heroku"
   },
-  "main": "build/src/index.js",
+  "main": "build/src/functions/index.js",
   "dependencies": {
     "axios": "^0.20.0",
     "cors": "^2.8.5",
