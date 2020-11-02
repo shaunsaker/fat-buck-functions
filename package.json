@@ -6,7 +6,6 @@
     "node": "10"
   },
   "scripts": {
-    "postinstall": "if [[ ${ON_HEROKU} ]]; then (npm run build); fi",
     "dev": "yarn ts-node-dev --respawn",
     "lint": "yarn lint:eslint && yarn lint:tsc",
     "lint:eslint": "eslint . --ext .ts,.tsx",
