@@ -1,4 +1,3 @@
-import { firebase } from '../../services/firebase';
 import { getDate } from '../../utils/getDate';
 import { toBTCDigits } from '../../utils/toBTCDigits';
 import { deductCommission } from './deductCommission';
@@ -9,30 +8,47 @@ import {
   TransactionType,
   UserData,
 } from '../../services/firebase/models';
+import { getUserBalance } from '../../services/firebase/getUserBalance';
+import { getPoolCommission } from '../../services/firebase/getPoolCommission';
+import { saveCommissionTransaction } from '../../services/firebase/saveCommissionTransaction';
+import { saveUserCommissionTransaction } from '../../services/firebase/saveUserCommissionTransaction';
+import { saveUserDepositTransaction } from '../../services/firebase/saveUserDepositTransaction';
+import { updateUserBalance } from '../../services/firebase/updateUserBalance';
+import { updatePoolCommission } from '../../services/firebase/updatePoolCommission';
 
 export const handleDeposit = async ({
   transactionId,
   data,
-  date,
-  onSaveCommission,
-  userBalance,
+  currentUserBalance,
+  currentPoolCommission,
+  onSaveCommissionTransaction,
+  onSaveUserCommissionTransaction,
+  onSaveUserDepositTransaction,
   onUpdateUserBalance,
-  poolCommission,
   onUpdatePoolCommission,
 }: {
   transactionId: string;
   data: DepositTransactionData;
-  date: string;
-  onSaveCommission: (commissionData: CommissionTransactionData) => void;
-  userBalance: number;
-  onUpdateUserBalance: (uid: string, userData: UserData) => void;
-  poolCommission: number;
-  onUpdatePoolCommission: (poolCommissionData: PoolCommissionData) => void;
+  currentUserBalance: number;
+  currentPoolCommission: number;
+  onSaveCommissionTransaction: (data: CommissionTransactionData) => void;
+  onSaveUserCommissionTransaction: (
+    uid: string,
+    data: CommissionTransactionData,
+  ) => void;
+  onSaveUserDepositTransaction: (
+    uid: string,
+    data: DepositTransactionData,
+  ) => void;
+  onUpdateUserBalance: (uid: string, data: UserData) => void;
+  onUpdatePoolCommission: (data: PoolCommissionData) => void;
 }): Promise<null> => {
+  // calculate the deducted commission
   const { amount, uid } = data;
   const { newAmount, commission } = deductCommission(amount);
 
   // save the commission as a new transaction
+  const date = getDate();
   const commissionData: CommissionTransactionData = {
     date,
     amount: commission,
@@ -40,79 +56,29 @@ export const handleDeposit = async ({
     depositId: transactionId,
     uid,
   };
+  await onSaveCommissionTransaction(commissionData);
 
-  await onSaveCommission(commissionData);
+  // save the same commission transaction to the user's transactions
+  await onSaveUserCommissionTransaction(uid, commissionData);
+
+  // save the deposit transaction data to the user's transactions
+  await onSaveUserDepositTransaction(uid, data);
 
   // update the user's balance
-  const newUserBalance = toBTCDigits(userBalance + newAmount);
+  const newUserBalance = toBTCDigits(currentUserBalance + newAmount);
   const userData: UserData = {
     balance: newUserBalance,
     balanceLastUpdated: date,
   };
-
   await onUpdateUserBalance(data.uid, userData);
 
   // update the pool balance
-  const newPoolBalance = poolCommission + commission;
+  const newPoolBalance = currentPoolCommission + commission;
   const poolCommissionData: PoolCommissionData = {
     amount: newPoolBalance,
     lastUpdated: date,
   };
-
   await onUpdatePoolCommission(poolCommissionData);
-
-  return null;
-};
-
-export const getUserBalance = async (uid: string): Promise<number> => {
-  const initialUserBalance = toBTCDigits(0);
-  const { balance: userBalance = initialUserBalance } = (await (
-    await firebase.firestore().collection('users').doc(uid).get()
-  ).data()) as UserData;
-
-  return userBalance;
-};
-
-export const getPoolCommission = async (): Promise<number> => {
-  const { amount: poolCommission } = (await (
-    await firebase.firestore().collection('pool').doc('commission').get()
-  ).data()) as PoolCommissionData;
-
-  return poolCommission;
-};
-
-export const saveCommission = async (
-  commissionData: CommissionTransactionData,
-): Promise<null> => {
-  console.log('Saving commission transaction.');
-  await firebase
-    .firestore()
-    .collection('transactions')
-    .doc()
-    .set(commissionData);
-
-  return null;
-};
-
-export const updateUserBalance = async (
-  uid: string,
-  userData: UserData,
-): Promise<null> => {
-  console.log('Updating user balance.');
-  await firebase.firestore().collection('users').doc(uid).update(userData);
-
-  return null;
-};
-
-export const updatePoolCommission = async (
-  poolCommissionData: PoolCommissionData,
-): Promise<null> => {
-  console.log('Updating pool commission.');
-  await firebase
-    .firestore()
-    .collection('pool')
-    .doc('commission')
-    .update(poolCommissionData);
 
   return null;
 };
@@ -121,18 +87,18 @@ export const processDeposit = async (
   transactionId: string,
   data: DepositTransactionData,
 ): Promise<null> => {
-  const date = getDate();
-  const userBalance = await getUserBalance(data.uid);
-  const poolCommission = await getPoolCommission();
+  const currentUserBalance = await getUserBalance(data.uid);
+  const currentPoolCommission = await getPoolCommission();
 
   await handleDeposit({
     transactionId,
     data,
-    date,
-    onSaveCommission: saveCommission,
-    userBalance,
+    currentUserBalance,
+    currentPoolCommission,
+    onSaveCommissionTransaction: saveCommissionTransaction,
+    onSaveUserCommissionTransaction: saveUserCommissionTransaction,
+    onSaveUserDepositTransaction: saveUserDepositTransaction,
     onUpdateUserBalance: updateUserBalance,
-    poolCommission,
     onUpdatePoolCommission: updatePoolCommission,
   });
 
