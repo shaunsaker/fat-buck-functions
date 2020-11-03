@@ -13,8 +13,8 @@ import { getPoolCommission } from '../../services/firebase/getPoolCommission';
 import { saveCommissionTransaction } from '../../services/firebase/saveCommissionTransaction';
 import { saveUserCommissionTransaction } from '../../services/firebase/saveUserCommissionTransaction';
 import { saveUserDepositTransaction } from '../../services/firebase/saveUserDepositTransaction';
-import { updateUserBalance } from '../../services/firebase/updateUserBalance';
-import { updatePoolCommission } from '../../services/firebase/updatePoolCommission';
+import { saveUserData } from '../../services/firebase/saveUserData';
+import { savePoolCommission } from '../../services/firebase/savePoolCommission';
 
 export const handleDeposit = async ({
   transactionId,
@@ -98,8 +98,8 @@ export const processDeposit = async (
     onSaveCommissionTransaction: saveCommissionTransaction,
     onSaveUserCommissionTransaction: saveUserCommissionTransaction,
     onSaveUserDepositTransaction: saveUserDepositTransaction,
-    onUpdateUserBalance: updateUserBalance,
-    onUpdatePoolCommission: updatePoolCommission,
+    onUpdateUserBalance: saveUserData,
+    onUpdatePoolCommission: savePoolCommission,
   });
 
   return null;
