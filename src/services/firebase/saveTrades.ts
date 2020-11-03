@@ -4,7 +4,7 @@ import { Trades, Trade, ParsedTrades } from '../bots/models';
 import { getDate } from '../../utils/getDate';
 import { TradeTransactionData, TransactionType } from './models';
 import { saveTransaction } from './saveTransaction';
-import { getTransactionExists } from './getTransaction';
+import { getTransactionExists } from './getTransactionExists';
 
 const getTradeId = (botId: string, trade: Trade): string => {
   const coin = trade.pair.split('/')[0];
