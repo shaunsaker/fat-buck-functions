@@ -8,7 +8,6 @@ import {
   UserData,
 } from '../../services/firebase/models';
 import { handleDeposit } from './processDeposit';
-import { MOCKED_MOMENT_ISO_STRING } from '../../../__mocks__/moment';
 
 describe('processDeposit', () => {
   it('works correctly', async () => {
@@ -44,7 +43,7 @@ describe('processDeposit', () => {
     });
 
     const { commission, newAmount } = deductCommission(depositAmount);
-    const date = MOCKED_MOMENT_ISO_STRING;
+    const date = '';
     const expectedCommissionData: CommissionTransactionData = {
       date,
       amount: commission,

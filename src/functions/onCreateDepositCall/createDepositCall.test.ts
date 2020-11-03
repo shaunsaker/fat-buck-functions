@@ -1,7 +1,6 @@
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { createDepositCall } from '.';
 import { DepositCallData, DepositStatus } from '../../services/firebase/models';
-import { MOCKED_MOMENT_ISO_STRING } from '../../../__mocks__/moment';
 
 describe('createDepositCall', () => {
   const walletAddress = '12345678';
@@ -33,7 +32,7 @@ describe('createDepositCall', () => {
     const result = await createDepositCall(data, context, saveDepositCall);
     const expectedDepositCallData: DepositCallData = {
       uid,
-      date: MOCKED_MOMENT_ISO_STRING,
+      date: '',
       walletAddress,
       status: DepositStatus.PENDING,
     };
