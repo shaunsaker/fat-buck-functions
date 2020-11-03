@@ -4,6 +4,7 @@ import { Trades, Trade, ParsedTrades } from '../bots/models';
 import { getDate } from '../../utils/getDate';
 import { TradeTransactionData, TransactionType } from './models';
 import { saveTransaction } from './saveTransaction';
+import { getTransactionExists } from './getTransaction';
 
 const getTradeId = (botId: string, trade: Trade): string => {
   const coin = trade.pair.split('/')[0];
@@ -42,15 +43,21 @@ export const saveTrades = async (
     }
 
     if (existingTrade && !trade.is_open) {
-      // closed trade, save the trade as transaction
-      const tradeTransactionData: TradeTransactionData = {
-        date,
-        amount: existingTrade.closeProfitAbs, // profit/loss
-        type: TransactionType.TRADE,
-        tradeId: existingTrade.id,
-      };
+      // only if there is not already an existing transaction
+      const tradeId = existingTrade.id;
+      const existingTransaction = await getTransactionExists(tradeId);
 
-      await saveTransaction(tradeTransactionData);
+      if (!existingTransaction) {
+        // closed trade, save the trade as transaction
+        const tradeTransactionData: TradeTransactionData = {
+          date,
+          amount: existingTrade.closeProfitAbs, // profit/loss
+          type: TransactionType.TRADE,
+          tradeId,
+        };
+
+        await saveTransaction(tradeTransactionData, tradeId);
+      }
     }
   }
 

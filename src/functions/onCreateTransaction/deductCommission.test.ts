@@ -2,7 +2,7 @@ import { toBTCDigits } from '../../utils/toBTCDigits';
 import { deductCommission } from './deductCommission';
 
 describe('deductCommission', () => {
-  it('works', () => {
+  it('works correctly', () => {
     const amount = toBTCDigits(0.00513081);
     const commissionPercentage = 2.5;
     const result = deductCommission(amount, commissionPercentage);
