@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import moment from 'moment';
 
 export const getDate = (timestamp?: number): string => {
   const date = moment(timestamp).toISOString();
