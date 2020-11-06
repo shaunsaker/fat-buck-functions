@@ -1,5 +1,6 @@
 export interface Trade {
   amount: number;
+  close_profit: number;
   close_profit_abs: number;
   close_timestamp: number;
   is_open: boolean;
@@ -15,6 +16,7 @@ export type Trades = Trade[];
 
 export interface ParsedTrade {
   amount: number;
+  closeProfit: number;
   closeProfitAbs: number;
   closeTimestamp: number;
   isOpen: boolean;

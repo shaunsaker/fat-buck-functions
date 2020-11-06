@@ -1,6 +1,5 @@
 import { getDate } from '../../utils/getDate';
 import { toBTCDigits } from '../../utils/toBTCDigits';
-import { deductCommission } from './deductCommission';
 import {
   CommissionTransactionData,
   DepositTransactionData,
@@ -15,6 +14,7 @@ import { saveUserCommissionTransaction } from '../../services/firebase/saveUserC
 import { saveUserDepositTransaction } from '../../services/firebase/saveUserDepositTransaction';
 import { saveUserData } from '../../services/firebase/saveUserData';
 import { savePoolCommission } from '../../services/firebase/savePoolCommission';
+import { deductCommission } from '../../utils/deductCommission';
 
 export const handleDeposit = async ({
   transactionId,

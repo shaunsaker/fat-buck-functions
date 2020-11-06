@@ -1,26 +1,18 @@
 import { getUniqueId } from '../../utils/getUniqueId';
-import { deductCommission } from './deductCommission';
 import {
   CommissionTransactionData,
-  DepositTransactionData,
   PoolCommissionData,
   TransactionType,
   UserData,
 } from '../../services/firebase/models';
 import { handleDeposit } from './processDeposit';
+import { makeDepositTransaction } from '../../testUtils/makeDepositTransaction';
+import { deductCommission } from '../../utils/deductCommission';
 
 describe('processDeposit', () => {
   it('works correctly', async () => {
     const depositAmount = 0.5010101;
-    const data: DepositTransactionData = {
-      type: TransactionType.DEPOSIT,
-      uid: getUniqueId(),
-      walletAddress: getUniqueId(),
-      depositCallId: getUniqueId(),
-      binanceTransactionId: getUniqueId(),
-      date: '',
-      amount: depositAmount,
-    };
+    const data = makeDepositTransaction(depositAmount);
     const transactionId = getUniqueId();
     const currentUserBalance = 0;
     const currentPoolCommission = 0;

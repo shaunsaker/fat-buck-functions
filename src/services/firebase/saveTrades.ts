@@ -54,6 +54,7 @@ export const saveTrades = async (
           amount: existingTrade.closeProfitAbs, // profit/loss
           type: TransactionType.TRADE,
           tradeId,
+          profitRatio: existingTrade.closeProfit,
         };
 
         await saveTransaction(tradeTransactionData, tradeId);

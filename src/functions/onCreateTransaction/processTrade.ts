@@ -3,37 +3,26 @@ import {
   PoolProfitData,
   TradeTransactionData,
   TransactionData,
-  TransactionType,
 } from '../../services/firebase/models';
-import { getPoolBalance } from '../../services/firebase/getPoolBalance';
 import { getTransactions } from '../../services/firebase/getTransactions';
 import { savePoolProfit } from '../../services/firebase/savePoolProfit';
+import { calculateTotalProfit } from './calculateTotalProfit';
 
 export const handleTrade = async ({
   // transactionId,
   // data,
   date,
-  poolBalance,
   transactions,
   onSavePoolProfit,
 }: {
   transactionId: string;
   data: TradeTransactionData;
   date: string;
-  poolBalance: number;
   transactions: TransactionData[];
   onSavePoolProfit: (poolProfitData: PoolProfitData) => void;
 }): Promise<null> => {
-  // recalculate our total profit = balance / (deposits + withdrawals)
-  const totalDeposits = transactions
-    .filter((transaction) => transaction.type === TransactionType.DEPOSIT)
-    .reduce((total, next) => total + next.amount, 0);
-  const totalWithdrawals = transactions
-    .filter((transaction) => transaction.type === TransactionType.WITHDRAWAL)
-    .reduce((total, next) => total + next.amount, 0);
-  const totalProfit = poolBalance / (totalDeposits + totalWithdrawals); // TODO: test this, I got infinity in the db
-
-  // save the new profit
+  // calculate and save the new profit
+  const totalProfit = calculateTotalProfit(transactions);
   const poolProfitData: PoolProfitData = {
     amount: totalProfit,
     lastUpdated: date,
@@ -51,14 +40,12 @@ export const processTrade = async (
   data: TradeTransactionData,
 ): Promise<null> => {
   const date = getDate();
-  const poolBalance = await getPoolBalance();
   const transactions = await getTransactions();
 
   await handleTrade({
     transactionId,
     data,
     date,
-    poolBalance,
     transactions,
     onSavePoolProfit: savePoolProfit,
   });

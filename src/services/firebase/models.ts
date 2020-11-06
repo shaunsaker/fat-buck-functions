@@ -42,12 +42,19 @@ export interface CommissionTransactionData extends BaseTransactionData {
 
 export interface TradeTransactionData extends BaseTransactionData {
   tradeId: string;
+  profitRatio: number;
+}
+
+export interface WithdrawalTransactionData extends BaseTransactionData {
+  uid: string;
+  walletAddress: string;
 }
 
 export type TransactionData =
   | DepositTransactionData
   | CommissionTransactionData
-  | TradeTransactionData; // TODO: or withdrawal etc
+  | TradeTransactionData
+  | WithdrawalTransactionData;
 
 export interface PoolBalanceData {
   amount: number;

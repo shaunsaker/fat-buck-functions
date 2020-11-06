@@ -1,4 +1,4 @@
-import { toBTCDigits } from '../../utils/toBTCDigits';
+import { toBTCDigits } from './toBTCDigits';
 import { deductCommission } from './deductCommission';
 
 describe('deductCommission', () => {
