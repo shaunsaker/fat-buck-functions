@@ -45,6 +45,7 @@ describe('processDeposit', () => {
     const expectedUserData: UserData = {
       balance: currentUserBalance + newAmount,
       balanceLastUpdated: date,
+      id: data.uid,
     };
 
     const expectedPoolCommissionData: PoolCommissionData = {

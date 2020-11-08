@@ -1,12 +1,7 @@
 import { getPoolBalance } from '../../services/firebase/getPoolBalance';
 import { getTransactions } from '../../services/firebase/getTransactions';
 import { getUsersWithBalances } from '../../services/firebase/getUsersWithBalances';
-import {
-  PoolProfitData,
-  TradeTransactionData,
-  TransactionData,
-  UserData,
-} from '../../services/firebase/models';
+import { TransactionData, UserData } from '../../services/firebase/models';
 import { savePoolProfit } from '../../services/firebase/savePoolProfit';
 import { saveUserData } from '../../services/firebase/saveUserData';
 import { saveUserTransaction } from '../../services/firebase/saveUserTransaction';

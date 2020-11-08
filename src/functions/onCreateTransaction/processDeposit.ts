@@ -4,7 +4,6 @@ import {
   CommissionTransactionData,
   DepositTransactionData,
   PoolCommissionData,
-  TransactionData,
   TransactionType,
   UserData,
 } from '../../services/firebase/models';
@@ -61,6 +60,7 @@ export const handleDeposit = async ({
   const userData: UserData = {
     balance: newUserBalance,
     balanceLastUpdated: date,
+    id: uid,
   };
   await onUpdateUserBalance(data.uid, userData);
 

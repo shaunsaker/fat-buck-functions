@@ -1,5 +1,5 @@
 import { firebase } from '.';
-import { CommissionTransactionData, TransactionData } from './models';
+import { TransactionData } from './models';
 
 export const saveUserTransaction = async (
   uid: string,
