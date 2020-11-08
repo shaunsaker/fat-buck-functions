@@ -45,6 +45,10 @@ export interface TradeTransactionData extends BaseTransactionData {
   profitRatio: number;
 }
 
+export interface UserTradeTransactionData extends TradeTransactionData {
+  transactionId: string;
+}
+
 export interface WithdrawalTransactionData extends BaseTransactionData {
   uid: string;
   walletAddress: string;
@@ -64,6 +68,7 @@ export interface PoolBalanceData {
 export interface UserData {
   balance: number;
   balanceLastUpdated: string;
+  id: string;
 }
 
 export interface PoolCommissionData {

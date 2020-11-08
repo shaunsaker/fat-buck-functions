@@ -1,11 +1,11 @@
 import { firebase } from '.';
-import { CommissionTransactionData } from './models';
+import { CommissionTransactionData, TransactionData } from './models';
 
-export const saveUserCommissionTransaction = async (
+export const saveUserTransaction = async (
   uid: string,
-  data: CommissionTransactionData,
+  data: TransactionData,
 ): Promise<null> => {
-  console.log('Saving user commission transaction.');
+  console.log('Saving user transaction.');
   await firebase
     .firestore()
     .collection('users')

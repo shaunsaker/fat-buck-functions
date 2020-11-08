@@ -4,14 +4,14 @@ import {
   CommissionTransactionData,
   DepositTransactionData,
   PoolCommissionData,
+  TransactionData,
   TransactionType,
   UserData,
 } from '../../services/firebase/models';
 import { getUserBalance } from '../../services/firebase/getUserBalance';
 import { getPoolCommission } from '../../services/firebase/getPoolCommission';
 import { saveCommissionTransaction } from '../../services/firebase/saveCommissionTransaction';
-import { saveUserCommissionTransaction } from '../../services/firebase/saveUserCommissionTransaction';
-import { saveUserDepositTransaction } from '../../services/firebase/saveUserDepositTransaction';
+import { saveUserTransaction } from '../../services/firebase/saveUserTransaction';
 import { saveUserData } from '../../services/firebase/saveUserData';
 import { savePoolCommission } from '../../services/firebase/savePoolCommission';
 import { deductCommission } from '../../utils/deductCommission';
@@ -22,8 +22,7 @@ export const handleDeposit = async ({
   currentUserBalance,
   currentPoolCommission,
   onSaveCommissionTransaction,
-  onSaveUserCommissionTransaction,
-  onSaveUserDepositTransaction,
+  onSaveUserTransaction,
   onUpdateUserBalance,
   onUpdatePoolCommission,
 }: {
@@ -31,17 +30,10 @@ export const handleDeposit = async ({
   data: DepositTransactionData;
   currentUserBalance: number;
   currentPoolCommission: number;
-  onSaveCommissionTransaction: (data: CommissionTransactionData) => void;
-  onSaveUserCommissionTransaction: (
-    uid: string,
-    data: CommissionTransactionData,
-  ) => void;
-  onSaveUserDepositTransaction: (
-    uid: string,
-    data: DepositTransactionData,
-  ) => void;
-  onUpdateUserBalance: (uid: string, data: UserData) => void;
-  onUpdatePoolCommission: (data: PoolCommissionData) => void;
+  onSaveCommissionTransaction: typeof saveCommissionTransaction;
+  onSaveUserTransaction: typeof saveUserTransaction;
+  onUpdateUserBalance: typeof saveUserData;
+  onUpdatePoolCommission: typeof savePoolCommission;
 }): Promise<null> => {
   // calculate the deducted commission
   const { amount, uid } = data;
@@ -59,10 +51,10 @@ export const handleDeposit = async ({
   await onSaveCommissionTransaction(commissionData);
 
   // save the same commission transaction to the user's transactions
-  await onSaveUserCommissionTransaction(uid, commissionData);
+  await onSaveUserTransaction(uid, commissionData);
 
   // save the deposit transaction data to the user's transactions
-  await onSaveUserDepositTransaction(uid, data);
+  await onSaveUserTransaction(uid, data);
 
   // update the user's balance
   const newUserBalance = toBTCDigits(currentUserBalance + newAmount);
@@ -96,8 +88,7 @@ export const processDeposit = async (
     currentUserBalance,
     currentPoolCommission,
     onSaveCommissionTransaction: saveCommissionTransaction,
-    onSaveUserCommissionTransaction: saveUserCommissionTransaction,
-    onSaveUserDepositTransaction: saveUserDepositTransaction,
+    onSaveUserTransaction: saveUserTransaction,
     onUpdateUserBalance: saveUserData,
     onUpdatePoolCommission: savePoolCommission,
   });

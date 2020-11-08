@@ -17,8 +17,7 @@ describe('processDeposit', () => {
     const currentUserBalance = 0;
     const currentPoolCommission = 0;
     const onSaveCommissionTransaction = jest.fn();
-    const onSaveUserCommissionTransaction = jest.fn();
-    const onSaveUserDepositTransaction = jest.fn();
+    const onSaveUserTransaction = jest.fn();
     const onUpdateUserBalance = jest.fn();
     const onUpdatePoolCommission = jest.fn();
 
@@ -28,8 +27,7 @@ describe('processDeposit', () => {
       currentUserBalance,
       currentPoolCommission,
       onSaveCommissionTransaction,
-      onSaveUserCommissionTransaction,
-      onSaveUserDepositTransaction,
+      onSaveUserTransaction,
       onUpdateUserBalance,
       onUpdatePoolCommission,
     });
@@ -57,11 +55,11 @@ describe('processDeposit', () => {
     expect(onSaveCommissionTransaction).toHaveBeenCalledWith(
       expectedCommissionData,
     );
-    expect(onSaveUserCommissionTransaction).toHaveBeenCalledWith(
+    expect(onSaveUserTransaction).toHaveBeenCalledWith(
       data.uid,
       expectedCommissionData,
     );
-    expect(onSaveUserDepositTransaction).toHaveBeenCalledWith(data.uid, data);
+    expect(onSaveUserTransaction).toHaveBeenCalledWith(data.uid, data);
     expect(onUpdateUserBalance).toHaveBeenCalledWith(
       data.uid,
       expectedUserData,
