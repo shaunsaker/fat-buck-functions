@@ -1,3 +1,18 @@
+export interface CallResponse {
+  success?: boolean;
+  error?: boolean;
+  message?: string;
+}
+
+export interface DepositCallArgs {
+  walletAddress: string;
+}
+
+export interface WithdrawalCallArgs {
+  walletAddress: string;
+  amount: number;
+}
+
 export enum DepositStatus {
   PENDING = 'PENDING',
   SUCCESS = 'SUCCESS',
@@ -14,6 +29,37 @@ export interface DepositCallData {
   resolvedDate?: string; // added once it has resolved (status is SUCCESS)
   message?: string; // used for errors
 }
+
+export enum WithdrawalStatus {
+  PENDING = 'PENDING',
+  EMAIL_SENT = 'EMAIL_SENT',
+  CANCELLED = 'CANCELLED',
+  AWAITING_APPROVAL = 'AWAITING_APPROVAL',
+  REJECTED = 'REJECTED',
+  PROCESSING = 'PROCESSING',
+  FAILURE = 'FAILURE',
+  COMPLETED = 'COMPLETED',
+}
+
+export interface WithdrawalCallData {
+  id?: string;
+  uid: string;
+  date: string;
+  walletAddress: string;
+  amount: number;
+  status: WithdrawalStatus;
+  binanceTransactionId?: string; // added once it has been seen in withdrawal history
+  finalAmount?: number; // after tx fee added once it has resolved (status is COMPLETED)
+  transactionFee?: number; // added once it has resolved (status is COMPLETED)
+  resolvedDate?: string; // added once it has resolved (status is COMPLETED)
+  message?: string; // used for errors
+}
+
+export const NO_UID_ERROR_MESSAGE = 'You shall not pass.';
+export const NO_WALLET_ADDRESS_ERROR_MESSAGE =
+  'You did not provide a wallet address.';
+export const INSUFFICIENT_FUNDS_ERROR_MESSAGE =
+  'You have requested to withdraw more BTC than is in your account.';
 
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',

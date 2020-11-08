@@ -1,13 +1,13 @@
 import { firebase } from '.';
-import { DepositCallData } from './models';
+import { WithdrawalCallData } from './models';
 
-export const saveDepositCall = async (
-  data: DepositCallData,
+export const saveWithdrawalCall = async (
+  data: WithdrawalCallData,
   id?: string,
 ): Promise<void> => {
   await firebase
     .firestore()
-    .collection('depositCalls')
+    .collection('withdrawalCall')
     .doc(id)
     .set(data, { merge: Boolean(id) });
 };
