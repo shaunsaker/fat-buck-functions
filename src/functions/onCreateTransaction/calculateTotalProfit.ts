@@ -1,23 +1,30 @@
 import {
-  TradeTransactionData,
   TransactionData,
   TransactionType,
 } from '../../services/firebase/models';
+import { toBTCDigits } from '../../utils/toBTCDigits';
 
 export const calculateTotalProfit = (
+  poolBalance: number,
   transactions: TransactionData[],
 ): number => {
-  // returns the avg trade profit ratio
-  const trades = transactions.filter(
-    (transaction) => transaction.type === TransactionType.TRADE,
-  ) as TradeTransactionData[];
-
-  if (!trades.length) {
+  if (!poolBalance) {
     return 0;
   }
 
-  const totalProfitRatio =
-    trades.reduce((total, next) => total + next.profitRatio, 0) / trades.length;
+  if (!transactions.length) {
+    return 0;
+  }
 
-  return totalProfitRatio;
+  // profit = poolBalance + withdrawals - deposits
+  const totalDeposits = transactions
+    .filter((transaction) => transaction.type === TransactionType.DEPOSIT)
+    .reduce((total, next) => total + next.amount, 0);
+  const totalWithdrawals = transactions
+    .filter((transaction) => transaction.type === TransactionType.WITHDRAWAL)
+    .reduce((total, next) => total + next.amount, 0);
+  const profit = toBTCDigits(poolBalance + totalWithdrawals - totalDeposits);
+  const profitRatio = toBTCDigits(profit / poolBalance);
+
+  return profitRatio;
 };
