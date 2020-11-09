@@ -11,5 +11,5 @@ export const getDepositHistory = async (): Promise<BinanceDepositList> => {
       headers: { 'X-MBX-APIKEY': binanceConfig.apiKey },
     },
   );
-  return data.depositList;
+  return data.data;
 };

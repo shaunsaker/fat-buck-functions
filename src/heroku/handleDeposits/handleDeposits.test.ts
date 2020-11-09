@@ -1,6 +1,5 @@
 import { processDeposits } from '../handleDeposits';
 import {
-  BinanceDepositHistory,
   BinanceDepositList,
   BinanceDepositStatus,
 } from '../../services/binance/models';
@@ -13,55 +12,12 @@ import {
 import { getDate } from '../../utils/getDate';
 import { getUniqueId } from '../../utils/getUniqueId';
 import { randomise } from '../../utils/randomise';
-
-const getDeposit = (
-  walletAddress: string,
-  binanceTransactionId: string,
-  status?: BinanceDepositStatus,
-  asset?: string,
-): BinanceDepositHistory => {
-  return {
-    insertTime: Date.now(),
-    amount: 1,
-    asset: asset || 'BTC',
-    address: walletAddress,
-    txId: binanceTransactionId,
-    status: status || BinanceDepositStatus.pending,
-  };
-};
-
-const getRandomDeposits = (count: number) => {
-  const walletAddress = getUniqueId();
-  const binanceTransactionId = getUniqueId();
-  return [...Array(count).keys()].map(() =>
-    getDeposit(walletAddress, binanceTransactionId),
-  );
-};
-
-const getDepositCall = (
-  walletAddress?: string,
-  binanceTransactionId?: string,
-  hasSuccess?: boolean,
-): DepositCallData => {
-  return {
-    id: getUniqueId(),
-    uid: getUniqueId(),
-    date: getDate(),
-    walletAddress: walletAddress || getUniqueId(),
-    status: hasSuccess ? DepositStatus.SUCCESS : DepositStatus.PENDING,
-    binanceTransactionId,
-    resolvedDate: hasSuccess ? getDate() : undefined,
-  };
-};
-
-const getRandomDepositCalls = (count: number) => {
-  return [...Array(count).keys()].map(() => getDepositCall());
-};
+import { makeBinanceDeposit } from '../../testUtils/makeBinanceDeposit';
+import { makeDepositCall } from '../../testUtils/makeDepositCall';
 
 describe('handleDeposits', () => {
   const onSaveTransaction = jest.fn();
   const onSaveDepositCall = jest.fn();
-  const date = getDate();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -70,31 +26,51 @@ describe('handleDeposits', () => {
   it('works when deposit history and deposit calls are empty', async () => {
     const depositHistory: BinanceDepositList = [];
     const depositCalls: DepositCallData[] = [];
-
-    await processDeposits(
-      depositHistory,
-      depositCalls,
-      onSaveTransaction,
-      onSaveDepositCall,
-      date,
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
 
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
+      onSaveTransaction,
+      onSaveDepositCall,
+    });
+
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).not.toHaveBeenCalled();
   });
 
   it('works when deposit history is empty but there are deposit calls', async () => {
     const depositHistory: BinanceDepositList = [];
-    const depositCalls: DepositCallData[] = getRandomDepositCalls(5);
-
-    await processDeposits(
-      depositHistory,
-      depositCalls,
-      onSaveTransaction,
-      onSaveDepositCall,
-      date,
+    const depositCalls: DepositCallData[] = [
+      makeDepositCall(),
+      makeDepositCall(),
+      makeDepositCall(),
+    ];
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
 
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
+      onSaveTransaction,
+      onSaveDepositCall,
+    });
+
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).not.toHaveBeenCalled();
   });
@@ -103,28 +79,40 @@ describe('handleDeposits', () => {
     const walletAddress = getUniqueId();
     const transactionId = getUniqueId();
     const depositHistory: BinanceDepositList = randomise([
-      ...getRandomDeposits(5),
-      getDeposit(walletAddress, transactionId),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(walletAddress, transactionId),
     ]);
-    const depositCall = getDepositCall(walletAddress);
+    const depositCall = makeDepositCall(walletAddress);
     const depositCalls: DepositCallData[] = randomise([
-      ...getRandomDepositCalls(5),
+      makeDepositCall(),
+      makeDepositCall(),
+      makeDepositCall(),
       depositCall,
     ]);
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
+    );
 
-    await processDeposits(
-      depositHistory,
-      depositCalls,
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
-      date,
-    );
+    });
 
     const expectedDeposit: DepositCallData = {
       ...depositCall,
       binanceTransactionId: transactionId,
     };
 
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).toHaveBeenCalledWith(
       expectedDeposit,
@@ -138,26 +126,38 @@ describe('handleDeposits', () => {
     const walletAddress2 = getUniqueId();
     const transactionId2 = getUniqueId();
     const depositHistory: BinanceDepositList = randomise([
-      ...getRandomDeposits(5),
-      getDeposit(walletAddress1, transactionId1),
-      getDeposit(walletAddress2, transactionId2),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(walletAddress1, transactionId1),
+      makeBinanceDeposit(walletAddress2, transactionId2),
     ]);
-    const depositCall1 = getDepositCall(walletAddress1);
-    const depositCall2 = getDepositCall(walletAddress2);
+    const depositCall1 = makeDepositCall(walletAddress1);
+    const depositCall2 = makeDepositCall(walletAddress2);
     const depositCalls: DepositCallData[] = randomise([
-      ...getRandomDepositCalls(5),
+      makeDepositCall(),
+      makeDepositCall(),
+      makeDepositCall(),
       depositCall1,
       depositCall2,
     ]);
-
-    await processDeposits(
-      depositHistory,
-      depositCalls,
-      onSaveTransaction,
-      onSaveDepositCall,
-      date,
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
 
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
+      onSaveTransaction,
+      onSaveDepositCall,
+    });
+
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).toHaveBeenCalledTimes(2);
   });
@@ -166,28 +166,43 @@ describe('handleDeposits', () => {
     const walletAddress = getUniqueId();
     const transactionId = getUniqueId();
     const depositHistory: BinanceDepositList = randomise([
-      ...getRandomDeposits(5),
-      getDeposit(walletAddress, transactionId, BinanceDepositStatus.verifying),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(
+        walletAddress,
+        transactionId,
+        BinanceDepositStatus.VERIFYING,
+      ),
     ]);
-    const depositCall = getDepositCall(walletAddress);
+    const depositCall = makeDepositCall(walletAddress);
     const depositCalls: DepositCallData[] = [
-      ...getRandomDepositCalls(5),
+      makeDepositCall(),
+      makeDepositCall(),
+      makeDepositCall(),
       depositCall,
     ];
-
-    await processDeposits(
-      depositHistory,
-      depositCalls,
-      onSaveTransaction,
-      onSaveDepositCall,
-      date,
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
 
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
+      onSaveTransaction,
+      onSaveDepositCall,
+    });
     const expectedDeposit: DepositCallData = {
       ...depositCall,
       binanceTransactionId: transactionId,
     };
 
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).toHaveBeenCalledWith(
       expectedDeposit,
@@ -198,29 +213,40 @@ describe('handleDeposits', () => {
   it('works with a matching success deposit', async () => {
     const walletAddress = getUniqueId();
     const transactionId = getUniqueId();
-    const deposit = getDeposit(
+    const deposit = makeBinanceDeposit(
       walletAddress,
       transactionId,
-      BinanceDepositStatus.success,
+      BinanceDepositStatus.SUCCESS,
     );
     const depositHistory: BinanceDepositList = randomise([
-      ...getRandomDeposits(5),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
       deposit,
     ]);
-    const depositCall = getDepositCall(walletAddress, transactionId);
+    const depositCall = makeDepositCall(walletAddress, transactionId);
     const depositCalls: DepositCallData[] = [
-      ...getRandomDepositCalls(5),
+      makeDepositCall(),
+      makeDepositCall(),
+      makeDepositCall(),
       depositCall,
     ];
-
-    await processDeposits(
-      depositHistory,
-      depositCalls,
-      onSaveTransaction,
-      onSaveDepositCall,
-      date,
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
 
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
+      onSaveTransaction,
+      onSaveDepositCall,
+    });
+
+    const date = getDate();
     const expectedTransaction: DepositTransactionData = {
       uid: depositCall.uid,
       walletAddress: depositCall.walletAddress,
@@ -236,6 +262,8 @@ describe('handleDeposits', () => {
       resolvedDate: date,
     };
 
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).toHaveBeenCalledWith(expectedTransaction);
     expect(onSaveDepositCall).toHaveBeenCalledWith(
       expectedDeposit,
@@ -249,26 +277,46 @@ describe('handleDeposits', () => {
     const walletAddress2 = getUniqueId();
     const transactionId2 = getUniqueId();
     const depositHistory: BinanceDepositList = randomise([
-      ...getRandomDeposits(5),
-      getDeposit(walletAddress1, transactionId1, BinanceDepositStatus.success),
-      getDeposit(walletAddress2, transactionId2, BinanceDepositStatus.success),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(
+        walletAddress1,
+        transactionId1,
+        BinanceDepositStatus.SUCCESS,
+      ),
+      makeBinanceDeposit(
+        walletAddress2,
+        transactionId2,
+        BinanceDepositStatus.SUCCESS,
+      ),
     ]);
-    const depositCall1 = getDepositCall(walletAddress1, transactionId1);
-    const depositCall2 = getDepositCall(walletAddress2, transactionId2);
+    const depositCall1 = makeDepositCall(walletAddress1, transactionId1);
+    const depositCall2 = makeDepositCall(walletAddress2, transactionId2);
     const depositCalls: DepositCallData[] = randomise([
-      ...getRandomDepositCalls(5),
+      makeDepositCall(),
+      makeDepositCall(),
+      makeDepositCall(),
       depositCall1,
       depositCall2,
     ]);
-
-    await processDeposits(
-      depositHistory,
-      depositCalls,
-      onSaveTransaction,
-      onSaveDepositCall,
-      date,
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
 
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
+      onSaveTransaction,
+      onSaveDepositCall,
+    });
+
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).toHaveBeenCalledTimes(2);
     expect(onSaveDepositCall).toHaveBeenCalledTimes(2);
   });
@@ -276,29 +324,41 @@ describe('handleDeposits', () => {
   it('works with already matched successful deposits', async () => {
     const walletAddress = getUniqueId();
     const transactionId = getUniqueId();
-    const deposit = getDeposit(
+    const deposit = makeBinanceDeposit(
       walletAddress,
       transactionId,
-      BinanceDepositStatus.success,
+      BinanceDepositStatus.SUCCESS,
     );
     const depositHistory: BinanceDepositList = randomise([
-      ...getRandomDeposits(5),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
       deposit,
     ]);
-    const depositCall = getDepositCall(walletAddress, transactionId, true);
+    const depositCall = makeDepositCall(walletAddress, transactionId, true);
     const depositCalls: DepositCallData[] = randomise([
-      ...getRandomDepositCalls(5),
+      makeDepositCall(),
+      makeDepositCall(),
+      makeDepositCall(),
       depositCall,
     ]);
-
-    await processDeposits(
-      depositHistory,
-      depositCalls,
-      onSaveTransaction,
-      onSaveDepositCall,
-      date,
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
 
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
+      onSaveTransaction,
+      onSaveDepositCall,
+    });
+
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toBeCalled();
     expect(onSaveDepositCall).not.toBeCalled();
   });
@@ -306,25 +366,35 @@ describe('handleDeposits', () => {
   it('works with deposits without matching deposit calls', async () => {
     const walletAddress = getUniqueId();
     const transactionId = getUniqueId();
-    const deposit = getDeposit(
+    const deposit = makeBinanceDeposit(
       walletAddress,
       transactionId,
-      BinanceDepositStatus.success,
+      BinanceDepositStatus.SUCCESS,
     );
     const depositHistory: BinanceDepositList = randomise([
-      ...getRandomDeposits(5),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
       deposit,
     ]);
     const depositCalls: DepositCallData[] = [];
-
-    await processDeposits(
-      depositHistory,
-      depositCalls,
-      onSaveTransaction,
-      onSaveDepositCall,
-      date,
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
 
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
+      onSaveTransaction,
+      onSaveDepositCall,
+    });
+
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toBeCalled();
     expect(onSaveDepositCall).not.toBeCalled();
   });
@@ -332,30 +402,42 @@ describe('handleDeposits', () => {
   it('works with non-matching wallet address', async () => {
     const walletAddress = getUniqueId();
     const transactionId = getUniqueId();
-    const deposit = getDeposit(
+    const deposit = makeBinanceDeposit(
       walletAddress,
       transactionId,
-      BinanceDepositStatus.success,
+      BinanceDepositStatus.SUCCESS,
     );
     const depositHistory: BinanceDepositList = randomise([
-      ...getRandomDeposits(5),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
       deposit,
     ]);
     const anotherWalletAddress = getUniqueId();
-    const depositCall = getDepositCall(anotherWalletAddress);
+    const depositCall = makeDepositCall(anotherWalletAddress);
     const depositCalls: DepositCallData[] = randomise([
-      ...getRandomDepositCalls(5),
+      makeDepositCall(),
+      makeDepositCall(),
+      makeDepositCall(),
       depositCall,
     ]);
-
-    await processDeposits(
-      depositHistory,
-      depositCalls,
-      onSaveTransaction,
-      onSaveDepositCall,
-      date,
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
 
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
+      onSaveTransaction,
+      onSaveDepositCall,
+    });
+
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toBeCalled();
     expect(onSaveDepositCall).not.toBeCalled();
   });
@@ -364,29 +446,39 @@ describe('handleDeposits', () => {
     const walletAddress = getUniqueId();
     const transactionId = getUniqueId();
     const notBTC = 'IOTA';
-    const deposit = getDeposit(
+    const deposit = makeBinanceDeposit(
       walletAddress,
       transactionId,
-      BinanceDepositStatus.success,
+      BinanceDepositStatus.SUCCESS,
       notBTC,
     );
     const depositHistory: BinanceDepositList = randomise([
-      ...getRandomDeposits(5),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
+      makeBinanceDeposit(getUniqueId(), getUniqueId()),
       deposit,
     ]);
-    const depositCall = getDepositCall(walletAddress, transactionId);
+    const depositCall = makeDepositCall(walletAddress, transactionId);
     const depositCalls: DepositCallData[] = randomise([
-      ...getRandomDepositCalls(5),
+      makeDepositCall(),
+      makeDepositCall(),
+      makeDepositCall(),
       depositCall,
     ]);
+    const onGetDepositHistory = jest.fn(
+      () =>
+        new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
+    );
+    const onGetDepositCalls = jest.fn(
+      () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
+    );
 
-    await processDeposits(
-      depositHistory,
-      depositCalls,
+    await processDeposits({
+      onGetDepositHistory,
+      onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
-      date,
-    );
+    });
 
     const expectedDeposit: DepositCallData = {
       ...depositCall,
@@ -395,6 +487,8 @@ describe('handleDeposits', () => {
       binanceTransactionId: transactionId,
     };
 
+    expect(onGetDepositHistory).toHaveBeenCalled();
+    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toBeCalled();
     expect(onSaveDepositCall).toHaveBeenCalledWith(
       expectedDeposit,

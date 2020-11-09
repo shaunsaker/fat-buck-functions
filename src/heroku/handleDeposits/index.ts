@@ -1,11 +1,7 @@
 import { getDepositHistory } from '../../services/binance/getDepositHistory';
-import {
-  BinanceDepositList,
-  BinanceDepositStatus,
-} from '../../services/binance/models';
+import { BinanceDepositStatus } from '../../services/binance/models';
 import { getDepositCalls } from '../../services/firebase/getDepositCalls';
 import {
-  DepositCallData,
   DepositStatus,
   DepositTransactionData,
   TransactionType,
@@ -14,13 +10,27 @@ import { saveDepositCall } from '../../services/firebase/saveDepositCall';
 import { saveTransaction } from '../../services/firebase/saveTransaction';
 import { getDate } from '../../utils/getDate';
 
-export const processDeposits = async (
-  depositHistory: BinanceDepositList,
-  depositCalls: DepositCallData[],
-  onSaveTransaction: (transaction: DepositTransactionData) => void,
-  onSaveDepositCall: (deposit: DepositCallData, id: string) => void,
-  date: string,
-): Promise<null> => {
+export const processDeposits = async ({
+  onGetDepositHistory,
+  onGetDepositCalls,
+  onSaveTransaction,
+  onSaveDepositCall,
+}: {
+  onGetDepositHistory: typeof getDepositHistory;
+  onGetDepositCalls: typeof getDepositCalls;
+  onSaveTransaction: typeof saveTransaction;
+  onSaveDepositCall: typeof saveDepositCall;
+}): Promise<null> => {
+  console.log('Processing deposits.');
+
+  // get the deposit history from binance
+  console.log('Getting deposit history.');
+  const depositHistory = await onGetDepositHistory();
+
+  // get the deposit calls from firebase
+  console.log('Getting deposit calls.');
+  const depositCalls = await onGetDepositCalls();
+
   // filter out the deposits in depositHistory that have already been resolved in depositCalls
   const unresolvedDeposits = depositHistory.filter((deposit) =>
     depositCalls.some(
@@ -50,21 +60,22 @@ export const processDeposits = async (
 
     // if the status is pending or verifying, add the binanceTransactionId
     if (
-      deposit.status === BinanceDepositStatus.pending ||
-      deposit.status === BinanceDepositStatus.verifying
+      deposit.status === BinanceDepositStatus.PENDING ||
+      deposit.status === BinanceDepositStatus.VERIFYING
     ) {
       newDepositCallData.binanceTransactionId = deposit.txId;
     }
 
     // if the status is success, update the deposit call and add the deposit to transactions
-    else if (deposit.status === BinanceDepositStatus.success) {
+    else if (deposit.status === BinanceDepositStatus.SUCCESS) {
       // check if the asset is BTC, if not don't process it but save it as an error
       if (deposit.asset !== 'BTC') {
         newDepositCallData.status = DepositStatus.ERROR;
         newDepositCallData.message = `We do not support ${deposit.asset} deposits. Your deposit will be returned to your wallet address, ${deposit.address}.`;
 
-        // TODO: withdraw to the user's address
+        // TODO: automatically withdraw to the user's address
       } else {
+        const date = getDate();
         newDepositCallData.resolvedDate = date;
         newDepositCallData.status = DepositStatus.SUCCESS;
 
@@ -96,22 +107,12 @@ export const processDeposits = async (
 };
 
 export const handleDeposits = async (): Promise<null> => {
-  // get the deposit history from binance
-  console.log('Getting deposit history.');
-  const depositHistory = await getDepositHistory();
-
-  // get the deposit calls from firebase
-  console.log('Getting deposit calls.');
-  const depositCalls = await getDepositCalls();
-
-  console.log('Processing deposits.');
-  await processDeposits(
-    depositHistory,
-    depositCalls,
-    saveTransaction,
-    saveDepositCall,
-    getDate(),
-  );
+  await processDeposits({
+    onGetDepositHistory: getDepositHistory,
+    onGetDepositCalls: getDepositCalls,
+    onSaveTransaction: saveTransaction,
+    onSaveDepositCall: saveDepositCall,
+  });
 
   return null;
 };

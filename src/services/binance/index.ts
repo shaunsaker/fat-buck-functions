@@ -3,6 +3,7 @@ import * as crypto from 'crypto';
 const apiBase = 'https://api.binance.com';
 export const binanceApiEndpoints = {
   depositHistory: `${apiBase}/wapi/v3/depositHistory.html`,
+  withdrawalHistory: `${apiBase}/wapi/v3/withdrawHistory.html`,
 };
 
 export const binanceConfig = {
