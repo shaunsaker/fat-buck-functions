@@ -4,7 +4,7 @@ import { PoolCommissionData } from './models';
 export const savePoolCommission = async (
   data: PoolCommissionData,
 ): Promise<null> => {
-  console.log('Updating pool commission.');
+  console.log('Saving pool commission.');
   await firebase
     .firestore()
     .collection('pool')

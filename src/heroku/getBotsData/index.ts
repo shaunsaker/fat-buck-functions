@@ -4,9 +4,11 @@ import { getIsAlive } from '../../services/bots/getIsAlive';
 import { getOpenTrades } from '../../services/bots/getOpenTrades';
 import { getTrades } from '../../services/bots/getTrades';
 import { getActiveBots } from '../../services/firebase/getActiveBots';
-import { saveBalance } from '../../services/firebase/saveBalance';
+import { savePoolBalance } from '../../services/firebase/savePoolBalance';
 import { saveIsAlive } from '../../services/firebase/saveIsAlive';
 import { saveTrades } from '../../services/firebase/saveTrades';
+import { PoolBalanceData } from '../../services/firebase/models';
+import { getDate } from '../../utils/getDate';
 
 export const getBotsData = async (): Promise<null> => {
   console.log('Getting active bots.');
@@ -40,8 +42,13 @@ export const getBotsData = async (): Promise<null> => {
 
     console.log('Getting balance.');
     const balance = await getBalance(bot.api, accessToken);
+
     console.log('Saving balance.');
-    await saveBalance(balance);
+    const poolBalanceData: PoolBalanceData = {
+      amount: balance.total,
+      lastUpdated: getDate(),
+    };
+    await savePoolBalance(poolBalanceData);
   }
 
   return null;

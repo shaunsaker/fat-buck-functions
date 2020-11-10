@@ -17,17 +17,19 @@ export const makeWithdrawalTransaction = ({
   withdrawalCallId,
   binanceTransactionId,
 }: {
-  transactions: TransactionData[];
+  transactions?: TransactionData[];
   amount?: number;
   walletAddress?: string;
   withdrawalCallId?: string;
   binanceTransactionId?: string;
 }): WithdrawalTransactionData => {
-  // use the existing transactions to make sure we don't withdraw more than is available
-  const availableBalance = getBalanceFromTransactions(transactions);
+  // use the existing transactions (if available) to make sure we don't withdraw more than is available
+  const availableBalance = transactions
+    ? getBalanceFromTransactions(transactions)
+    : toBTCDigits(getRandomNumber(0.001, 1));
   const amountToUse =
     amount || toBTCDigits(getRandomNumber(0, availableBalance));
-  const resolvedAmount = amountToUse - BINANCE_WITHDRAWAL_FEE;
+  const resolvedAmount = toBTCDigits(amountToUse - BINANCE_WITHDRAWAL_FEE);
 
   return {
     date: getDate(),
