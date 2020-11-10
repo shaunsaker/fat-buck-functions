@@ -21,14 +21,10 @@ export const processDeposits = async ({
   onSaveTransaction: typeof saveTransaction;
   onSaveDepositCall: typeof saveDepositCall;
 }): Promise<null> => {
-  console.log('Processing deposits.');
-
   // get the deposit history from binance
-  console.log('Getting deposit history.');
   const depositHistory = await onGetDepositHistory();
 
   // get the deposit calls from firebase
-  console.log('Getting deposit calls.');
   const depositCalls = await onGetDepositCalls();
 
   // filter out the deposits in depositHistory that have already been resolved in depositCalls
@@ -58,11 +54,8 @@ export const processDeposits = async ({
 
     const newDepositCallData = { ...depositCall };
 
-    // if the status is pending or verifying, add the binanceTransactionId
-    if (
-      deposit.status === BinanceDepositStatus.PENDING ||
-      deposit.status === BinanceDepositStatus.VERIFYING
-    ) {
+    // if the status is not success, add the binanceTransactionId
+    if (deposit.status !== BinanceDepositStatus.SUCCESS) {
       newDepositCallData.binanceTransactionId = deposit.txId;
     }
 

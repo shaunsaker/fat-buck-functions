@@ -4,6 +4,7 @@ import { makeDepositTransaction } from '../testUtils/makeDepositTransaction';
 import { makeTradeTransaction } from '../testUtils/makeTradeTransaction';
 import { makeWithdrawalTransaction } from '../testUtils/makeWithdrawalTransaction';
 import { getBalanceFromTransactions } from './getBalanceFromTransactions';
+import { toBTCDigits } from './toBTCDigits';
 
 describe('getBalanceFromTransactions', () => {
   it('returns 0 when there are no transactions', () => {
@@ -34,7 +35,7 @@ describe('getBalanceFromTransactions', () => {
       commissionA,
       commissionB,
     ];
-    const expectedBalance = depositA.amount + depositB.amount; // NOTE that we don't include the commission transactions
+    const expectedBalance = toBTCDigits(depositA.amount + depositB.amount); // NOTE that we don't include the commission transactions
     const balance = getBalanceFromTransactions(transactions);
 
     expect(balance).toEqual(expectedBalance);
@@ -51,11 +52,12 @@ describe('getBalanceFromTransactions', () => {
       commissionA,
       commissionB,
     ];
-    const expectedBalance =
+    const expectedBalance = toBTCDigits(
       depositA.amount +
-      depositB.amount -
-      commissionA.amount -
-      commissionB.amount;
+        depositB.amount -
+        commissionA.amount -
+        commissionB.amount,
+    );
     const balance = getBalanceFromTransactions(transactions, true);
 
     expect(balance).toEqual(expectedBalance);
@@ -72,11 +74,12 @@ describe('getBalanceFromTransactions', () => {
       commissionA,
       commissionB,
     ];
-    const withdrawalA = makeWithdrawalTransaction(transactions);
+    const withdrawalA = makeWithdrawalTransaction({ transactions });
     transactions.push(withdrawalA);
 
-    const expectedBalance =
-      depositA.amount + depositB.amount - withdrawalA.amount;
+    const expectedBalance = toBTCDigits(
+      depositA.amount + depositB.amount - withdrawalA.amount,
+    );
     const balance = getBalanceFromTransactions(transactions);
 
     expect(balance).toEqual(expectedBalance);
@@ -97,15 +100,16 @@ describe('getBalanceFromTransactions', () => {
       tradeA,
       tradeB,
     ];
-    const withdrawalA = makeWithdrawalTransaction(transactions);
+    const withdrawalA = makeWithdrawalTransaction({ transactions });
     transactions.push(withdrawalA);
 
-    const expectedBalance =
+    const expectedBalance = toBTCDigits(
       depositA.amount +
-      depositB.amount -
-      withdrawalA.amount +
-      tradeA.amount +
-      tradeB.amount;
+        depositB.amount -
+        withdrawalA.amount +
+        tradeA.amount +
+        tradeB.amount,
+    );
     const balance = getBalanceFromTransactions(transactions);
 
     expect(balance).toEqual(expectedBalance);

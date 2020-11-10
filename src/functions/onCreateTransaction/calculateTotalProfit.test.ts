@@ -42,7 +42,7 @@ describe('calculateTotalProfit', () => {
       makeDepositTransaction(),
       makeDepositTransaction(),
     ];
-    const withdrawal = makeWithdrawalTransaction(transactions);
+    const withdrawal = makeWithdrawalTransaction({ transactions });
     transactions.push(withdrawal);
     const actualBalance = getBalanceFromTransactions(transactions);
     const actualProfit = 1; // NOTE that this is positive
@@ -61,7 +61,7 @@ describe('calculateTotalProfit', () => {
       makeTradeTransaction(),
       makeTradeTransaction(),
     ];
-    const withdrawal = makeWithdrawalTransaction(transactions);
+    const withdrawal = makeWithdrawalTransaction({ transactions });
     transactions.push(withdrawal);
     const actualBalance = getBalanceFromTransactions(transactions); // NOTE that we use the actual balance, the profit/loss comes from the trades
     const totalProfit = calculateTotalProfit(actualBalance, transactions);

@@ -37,7 +37,7 @@ export interface BinanceWithdrawalHistory {
   asset: string;
   address: string;
   txId: string;
-  status: BinanceDepositStatus;
+  status: BinanceWithdrawalStatus;
 }
 
 export type BinanceWithdrawalList = BinanceWithdrawalHistory[];
@@ -46,3 +46,5 @@ export interface BinanceWithdrawalHistoryResponse {
   data: BinanceWithdrawalList;
   success: boolean;
 }
+
+export const BINANCE_WITHDRAWAL_FEE = 0.0004;

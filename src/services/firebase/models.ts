@@ -49,8 +49,6 @@ export interface WithdrawalCallData {
   amount: number;
   status: WithdrawalStatus;
   binanceTransactionId?: string; // added once it has been seen in withdrawal history
-  finalAmount?: number; // after tx fee added once it has resolved (status is COMPLETED)
-  transactionFee?: number; // added once it has resolved (status is COMPLETED)
   resolvedDate?: string; // added once it has resolved (status is COMPLETED)
   message?: string; // used for errors
 }
@@ -98,6 +96,10 @@ export interface UserTradeTransactionData extends TradeTransactionData {
 export interface WithdrawalTransactionData extends BaseTransactionData {
   uid: string;
   walletAddress: string;
+  withdrawalCallId: string;
+  binanceTransactionId: string;
+  transactionFee: number;
+  resolvedAmount: number;
 }
 
 export type TransactionData =

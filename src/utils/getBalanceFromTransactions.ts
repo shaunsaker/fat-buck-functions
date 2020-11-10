@@ -1,4 +1,5 @@
 import { TransactionData, TransactionType } from '../services/firebase/models';
+import { toBTCDigits } from './toBTCDigits';
 
 export const getBalanceFromTransactions = (
   transactions: TransactionData[],
@@ -23,8 +24,9 @@ export const getBalanceFromTransactions = (
       .reduce((total, next) => total + next.amount, 0);
   }
 
-  const balance =
-    totalDeposits - totalWithdrawals + totalTrades - totalCommission;
+  const balance = toBTCDigits(
+    totalDeposits - totalWithdrawals + totalTrades - totalCommission,
+  );
 
   return balance;
 };
