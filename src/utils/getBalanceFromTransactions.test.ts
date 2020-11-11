@@ -15,18 +15,18 @@ describe('getBalanceFromTransactions', () => {
   });
 
   it('returns a value when there are deposits', () => {
-    const depositA = makeDepositTransaction();
-    const depositB = makeDepositTransaction();
+    const depositA = makeDepositTransaction({});
+    const depositB = makeDepositTransaction({});
     const transactions: TransactionData[] = [depositA, depositB];
-    const expectedBalance = depositA.amount + depositB.amount;
+    const expectedBalance = toBTCDigits(depositA.amount + depositB.amount);
     const balance = getBalanceFromTransactions(transactions);
 
     expect(balance).toEqual(expectedBalance);
   });
 
   it('doesnt include commission transactions in pool transactions calculation', () => {
-    const depositA = makeDepositTransaction();
-    const depositB = makeDepositTransaction();
+    const depositA = makeDepositTransaction({});
+    const depositB = makeDepositTransaction({});
     const commissionA = makeCommissionTransaction(depositA);
     const commissionB = makeCommissionTransaction(depositB);
     const transactions: TransactionData[] = [
@@ -42,8 +42,8 @@ describe('getBalanceFromTransactions', () => {
   });
 
   it('includes commission transactions in user transactions calculation', () => {
-    const depositA = makeDepositTransaction();
-    const depositB = makeDepositTransaction();
+    const depositA = makeDepositTransaction({});
+    const depositB = makeDepositTransaction({});
     const commissionA = makeCommissionTransaction(depositA);
     const commissionB = makeCommissionTransaction(depositB);
     const transactions: TransactionData[] = [
@@ -64,8 +64,8 @@ describe('getBalanceFromTransactions', () => {
   });
 
   it('returns a value when there are deposits, withdrawals and commission', () => {
-    const depositA = makeDepositTransaction();
-    const depositB = makeDepositTransaction();
+    const depositA = makeDepositTransaction({});
+    const depositB = makeDepositTransaction({});
     const commissionA = makeCommissionTransaction(depositA);
     const commissionB = makeCommissionTransaction(depositB);
     const transactions: TransactionData[] = [
@@ -86,12 +86,12 @@ describe('getBalanceFromTransactions', () => {
   });
 
   it('returns a value when there are deposits, withdrawals, commissions and trades', () => {
-    const depositA = makeDepositTransaction();
-    const depositB = makeDepositTransaction();
+    const depositA = makeDepositTransaction({});
+    const depositB = makeDepositTransaction({});
     const commissionA = makeCommissionTransaction(depositA);
     const commissionB = makeCommissionTransaction(depositB);
-    const tradeA = makeTradeTransaction();
-    const tradeB = makeTradeTransaction();
+    const tradeA = makeTradeTransaction({});
+    const tradeB = makeTradeTransaction({});
     const transactions: TransactionData[] = [
       depositA,
       depositB,

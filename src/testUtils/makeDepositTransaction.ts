@@ -7,11 +7,15 @@ import { getRandomNumber } from '../utils/getRandomNumber';
 import { getUniqueId } from '../utils/getUniqueId';
 import { toBTCDigits } from '../utils/toBTCDigits';
 
-export const makeDepositTransaction = (
-  amount?: number,
-): DepositTransactionData => {
+export const makeDepositTransaction = ({
+  amount,
+  date,
+}: {
+  amount?: number;
+  date?: string;
+}): DepositTransactionData => {
   return {
-    date: getDate(),
+    date: date || getDate(),
     amount: amount || toBTCDigits(getRandomNumber(0, 0.1)),
     type: TransactionType.DEPOSIT,
     uid: getUniqueId(),

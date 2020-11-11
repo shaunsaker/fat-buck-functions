@@ -20,7 +20,7 @@ describe('processTrade', () => {
   describe('handleTrade', () => {
     it('calls onSavePoolProfit and onSaveUserTransactions with the args', async () => {
       const transactionId = getUniqueId();
-      const data = makeTradeTransaction();
+      const data = makeTradeTransaction({});
       const onSavePoolProfit = jest.fn();
       const onSaveUserTransactions = jest.fn();
 
@@ -32,7 +32,6 @@ describe('processTrade', () => {
       });
 
       expect(onSavePoolProfit).toHaveBeenCalledWith({
-        onGetPoolBalance: getPoolBalance,
         onGetTransactions: getTransactions,
         onSavePoolProfit: savePoolProfit,
       });
@@ -48,63 +47,33 @@ describe('processTrade', () => {
   });
 
   describe('handleSavePoolProfit', () => {
-    it('does not update the pool profit if there is no pool balance', async () => {
-      const onGetPoolBalance = jest.fn(
-        () => new Promise<number>((resolve) => resolve(0)),
-      );
-      const onGetTransactions = jest.fn(
-        () => new Promise<TransactionData[]>((resolve) => resolve([])),
-      );
-      const onSavePoolProfit = jest.fn();
-
-      await handleSavePoolProfit({
-        onGetPoolBalance,
-        onGetTransactions,
-        onSavePoolProfit,
-      });
-
-      expect(onGetPoolBalance).toHaveBeenCalled();
-      expect(onGetTransactions).not.toHaveBeenCalled();
-      expect(onSavePoolProfit).not.toHaveBeenCalled();
-    });
-
     it('does not update the pool profit if there are no transactions', async () => {
-      const onGetPoolBalance = jest.fn(
-        () => new Promise<number>((resolve) => resolve(1)),
-      );
       const onGetTransactions = jest.fn(
         () => new Promise<TransactionData[]>((resolve) => resolve([])),
       );
       const onSavePoolProfit = jest.fn();
 
       await handleSavePoolProfit({
-        onGetPoolBalance,
         onGetTransactions,
         onSavePoolProfit,
       });
 
-      expect(onGetPoolBalance).toHaveBeenCalled();
       expect(onGetTransactions).toHaveBeenCalled();
       expect(onSavePoolProfit).not.toHaveBeenCalled();
     });
 
     it('updates the pool profit when there are transactions', async () => {
-      const trade = makeTradeTransaction();
-      const onGetPoolBalance = jest.fn(
-        () => new Promise<number>((resolve) => resolve(1)),
-      );
+      const trade = makeTradeTransaction({});
       const onGetTransactions = jest.fn(
         () => new Promise<TransactionData[]>((resolve) => resolve([trade])),
       );
       const onSavePoolProfit = jest.fn();
 
       await handleSavePoolProfit({
-        onGetPoolBalance,
         onGetTransactions,
         onSavePoolProfit,
       });
 
-      expect(onGetPoolBalance).toHaveBeenCalled();
       expect(onGetTransactions).toHaveBeenCalled();
       expect(onSavePoolProfit).toHaveBeenCalledWith({
         amount: expect.any(Number),
@@ -179,7 +148,7 @@ describe('processTrade', () => {
   describe('handleSaveUserTransactions', () => {
     it('works correctly when there are no users with balances', async () => {
       const transactionId = getUniqueId();
-      const data = makeTradeTransaction();
+      const data = makeTradeTransaction({});
       const poolBalance = 1;
       const onGetPoolBalance = jest.fn(
         () => new Promise<number>((resolve) => resolve(poolBalance)),
@@ -212,7 +181,7 @@ describe('processTrade', () => {
 
     it('works correctly when there are users with balances', async () => {
       const transactionId = getUniqueId();
-      const data = makeTradeTransaction();
+      const data = makeTradeTransaction({});
       const poolBalance = 1;
       const onGetPoolBalance = jest.fn(
         () => new Promise<number>((resolve) => resolve(poolBalance)),

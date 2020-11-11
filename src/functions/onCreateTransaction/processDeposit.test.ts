@@ -12,7 +12,7 @@ import { deductCommission } from '../../utils/deductCommission';
 describe('processDeposit', () => {
   it('works correctly', async () => {
     const depositAmount = 0.5010101;
-    const data = makeDepositTransaction(depositAmount);
+    const data = makeDepositTransaction({ amount: depositAmount });
     const transactionId = getUniqueId();
     const currentUserBalance = 0;
     const currentPoolCommission = 0;

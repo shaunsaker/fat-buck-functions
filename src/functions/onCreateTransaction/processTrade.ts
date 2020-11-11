@@ -14,21 +14,12 @@ import { saveUserTransaction } from '../../services/firebase/saveUserTransaction
 import { saveUserData } from '../../services/firebase/saveUserData';
 
 export const handleSavePoolProfit = async ({
-  onGetPoolBalance,
   onGetTransactions,
   onSavePoolProfit,
 }: {
-  onGetPoolBalance: typeof getPoolBalance;
   onGetTransactions: typeof getTransactions;
   onSavePoolProfit: typeof savePoolProfit;
 }): Promise<null> => {
-  // get the pool balance
-  const poolBalance = await onGetPoolBalance();
-
-  if (!poolBalance) {
-    return null;
-  }
-
   // get the transactions
   const transactions = await onGetTransactions();
 
@@ -37,7 +28,7 @@ export const handleSavePoolProfit = async ({
   }
 
   // calculate and save the new profit
-  const totalProfit = calculateTotalProfit(poolBalance, transactions);
+  const totalProfit = calculateTotalProfit(transactions);
   const poolProfitData: PoolProfitData = {
     amount: totalProfit,
     lastUpdated: getDate(),
@@ -142,7 +133,6 @@ export const handleTrade = async ({
   onSaveUserTransactions: typeof handleSaveUserTransactions;
 }): Promise<null> => {
   await onSavePoolProfit({
-    onGetPoolBalance: getPoolBalance,
     onGetTransactions: getTransactions,
     onSavePoolProfit: savePoolProfit,
   });

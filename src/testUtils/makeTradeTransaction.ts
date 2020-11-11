@@ -7,9 +7,13 @@ import { getRandomNumber } from '../utils/getRandomNumber';
 import { getUniqueId } from '../utils/getUniqueId';
 import { toBTCDigits } from '../utils/toBTCDigits';
 
-export const makeTradeTransaction = (): TradeTransactionData => {
+export const makeTradeTransaction = ({
+  date,
+}: {
+  date?: string;
+}): TradeTransactionData => {
   return {
-    date: getDate(),
+    date: date || getDate(),
     amount: toBTCDigits(getRandomNumber(-0.001, 0.001)),
     type: TransactionType.TRADE,
     tradeId: getUniqueId(),

@@ -1,71 +1,73 @@
 import { TransactionData } from '../../services/firebase/models';
 import { makeDepositTransaction } from '../../testUtils/makeDepositTransaction';
 import { makeTradeTransaction } from '../../testUtils/makeTradeTransaction';
-import { makeWithdrawalTransaction } from '../../testUtils/makeWithdrawalTransaction';
-import { getBalanceFromTransactions } from '../../utils/getBalanceFromTransactions';
 import { calculateTotalProfit } from './calculateTotalProfit';
+import * as moment from 'moment';
+import { toBTCDigits } from '../../utils/toBTCDigits';
 
 describe('calculateTotalProfit', () => {
-  it('returns 0 when there is no pool balance', () => {
-    const poolBalance = 0;
-    const transactions: TransactionData[] = [];
-    const totalProfit = calculateTotalProfit(poolBalance, transactions);
-
-    expect(totalProfit).toEqual(0);
-  });
-
   it('returns 0 when there are no transactions', () => {
-    const poolBalance = 1;
     const transactions: TransactionData[] = [];
-    const totalProfit = calculateTotalProfit(poolBalance, transactions);
+    const totalProfit = calculateTotalProfit(transactions);
 
     expect(totalProfit).toEqual(0);
   });
 
-  it('returns the profit ratio when there are only deposits', () => {
+  it('returns 0 when there are no trade transactions', () => {
     const transactions: TransactionData[] = [
-      makeDepositTransaction(),
-      makeDepositTransaction(),
-      makeDepositTransaction(),
+      makeDepositTransaction({}),
+      makeDepositTransaction({}),
+      makeDepositTransaction({}),
     ];
-    const actualBalance = getBalanceFromTransactions(transactions);
-    const actualProfit = 1; // NOTE that this is positive
-    const poolBalance = actualBalance + actualProfit;
-    const calculatedProfit = calculateTotalProfit(poolBalance, transactions);
+    const totalProfit = calculateTotalProfit(transactions);
 
-    expect(calculatedProfit).toBeGreaterThan(0); // any positive number
+    expect(totalProfit).toEqual(0);
   });
 
-  it('returns the profit ratio when there are both deposits and withdrawals', () => {
+  it('returns the profit ratio when there are no deposits/withdrawals after the last trade', () => {
+    const earliestDate = moment().toISOString();
+    const latestDate = moment().add(5, 'days').toISOString();
+    const depositTransaction = makeDepositTransaction({
+      date: earliestDate,
+    });
+    const tradeTransaction = makeTradeTransaction({
+      date: latestDate,
+    });
     const transactions: TransactionData[] = [
-      makeDepositTransaction(),
-      makeDepositTransaction(),
-      makeDepositTransaction(),
+      depositTransaction,
+      tradeTransaction,
     ];
-    const withdrawal = makeWithdrawalTransaction({ transactions });
-    transactions.push(withdrawal);
-    const actualBalance = getBalanceFromTransactions(transactions);
-    const actualProfit = 1; // NOTE that this is positive
-    const poolBalance = actualBalance + actualProfit;
-    const totalProfit = calculateTotalProfit(poolBalance, transactions);
+    const totalProfit = calculateTotalProfit(transactions);
+    const expectedTotalProfit = toBTCDigits(
+      tradeTransaction.amount /
+        (tradeTransaction.amount + depositTransaction.amount),
+    );
 
-    expect(totalProfit).toBeGreaterThan(0); // any positive number
+    expect(totalProfit).toEqual(expectedTotalProfit);
   });
 
-  it('returns the profit ratio as normal', () => {
+  it('returns the profit ratio when there are deposits/withdrawals after the last trade', () => {
+    const earliestDate = moment().toISOString();
+    const latestDate = moment().add(5, 'days').toISOString();
+    const depositTransaction = makeDepositTransaction({
+      date: earliestDate,
+    });
+    const tradeTransaction = makeTradeTransaction({
+      date: earliestDate,
+    });
     const transactions: TransactionData[] = [
-      makeDepositTransaction(),
-      makeDepositTransaction(),
-      makeDepositTransaction(),
-      makeTradeTransaction(),
-      makeTradeTransaction(),
-      makeTradeTransaction(),
+      depositTransaction,
+      tradeTransaction,
+      makeDepositTransaction({
+        date: latestDate,
+      }),
     ];
-    const withdrawal = makeWithdrawalTransaction({ transactions });
-    transactions.push(withdrawal);
-    const actualBalance = getBalanceFromTransactions(transactions); // NOTE that we use the actual balance, the profit/loss comes from the trades
-    const totalProfit = calculateTotalProfit(actualBalance, transactions);
+    const totalProfit = calculateTotalProfit(transactions);
+    const expectedTotalProfit = toBTCDigits(
+      tradeTransaction.amount /
+        (tradeTransaction.amount + depositTransaction.amount), // NOTE that we exclude the last deposit since it happened after the last trade
+    );
 
-    expect(totalProfit).toEqual(expect.any(Number));
+    expect(totalProfit).toEqual(expectedTotalProfit);
   });
 });
