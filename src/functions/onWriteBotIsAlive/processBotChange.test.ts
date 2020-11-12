@@ -1,4 +1,3 @@
-import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import { BotData } from '../../services/firebase/models';
 import { makeBotData } from '../../testUtils/makeBotData';
 import { makeFirestoreDocument } from '../../testUtils/makeFirestoreDocument';
