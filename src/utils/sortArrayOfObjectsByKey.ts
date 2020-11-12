@@ -1,8 +1,8 @@
 // sorts an array of objects by key
 // with optional reverse order functionality
-export const sortArrayOfObjectsByKey = (
-  array: any[],
-  key: string,
+export const sortArrayOfObjectsByKey = <T>(
+  array: T[],
+  key: keyof T,
   reverseOrder?: boolean,
 ): any[] => {
   const newArray = [...array];
