@@ -16,7 +16,7 @@ export interface BinanceDepositHistory {
 export type BinanceDepositList = BinanceDepositHistory[];
 
 export interface BinanceDepositHistoryResponse {
-  data: BinanceDepositList;
+  depositList: BinanceDepositList;
   success: boolean;
 }
 
@@ -43,7 +43,7 @@ export interface BinanceWithdrawalHistory {
 export type BinanceWithdrawalList = BinanceWithdrawalHistory[];
 
 export interface BinanceWithdrawalHistoryResponse {
-  data: BinanceWithdrawalList;
+  withdrawList: BinanceWithdrawalList;
   success: boolean;
 }
 

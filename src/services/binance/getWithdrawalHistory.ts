@@ -17,5 +17,5 @@ export const getWithdrawalHistory = async (): Promise<
       headers: { 'X-MBX-APIKEY': binanceConfig.apiKey },
     },
   );
-  return data.data;
+  return data.withdrawList;
 };
