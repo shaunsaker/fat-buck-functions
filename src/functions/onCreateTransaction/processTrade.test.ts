@@ -76,8 +76,9 @@ describe('processTrade', () => {
 
       expect(onGetTransactions).toHaveBeenCalled();
       expect(onSavePoolProfit).toHaveBeenCalledWith({
+        ratio: expect.any(Number),
         amount: expect.any(Number),
-        lastUpdated: '',
+        lastUpdated: getDate(),
       });
     });
   });

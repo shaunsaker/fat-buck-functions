@@ -28,9 +28,10 @@ export const handleSavePoolProfit = async ({
   }
 
   // calculate and save the new profit
-  const totalProfit = calculateTotalProfit(transactions);
+  const { ratio, amount } = calculateTotalProfit(transactions);
   const poolProfitData: PoolProfitData = {
-    amount: totalProfit,
+    ratio,
+    amount,
     lastUpdated: getDate(),
   };
 

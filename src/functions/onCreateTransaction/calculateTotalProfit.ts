@@ -8,9 +8,15 @@ import { toBTCDigits } from '../../utils/toBTCDigits';
 
 export const calculateTotalProfit = (
   transactions: TransactionData[],
-): number => {
+): {
+  ratio: number;
+  amount: number;
+} => {
   if (!transactions.length) {
-    return 0;
+    return {
+      ratio: 0,
+      amount: 0,
+    };
   }
 
   const trades = transactions.filter(
@@ -18,7 +24,10 @@ export const calculateTotalProfit = (
   );
 
   if (!trades.length) {
-    return 0;
+    return {
+      ratio: 0,
+      amount: 0,
+    };
   }
 
   const lastestTradeDate = sortArrayOfObjectsByKey(trades, 'date', true)[0]
@@ -40,7 +49,10 @@ export const calculateTotalProfit = (
   const profit = toBTCDigits(
     poolBalanceAtLatestTradeDate + totalWithdrawals - totalDeposits,
   );
-  const profitRatio = toBTCDigits(profit / poolBalanceAtLatestTradeDate);
+  const ratio = toBTCDigits(profit / poolBalanceAtLatestTradeDate);
 
-  return profitRatio;
+  return {
+    ratio,
+    amount: profit,
+  };
 };

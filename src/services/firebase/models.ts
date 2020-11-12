@@ -126,6 +126,7 @@ export interface PoolCommissionData {
 }
 
 export interface PoolProfitData {
+  ratio: number;
   amount: number;
   lastUpdated: string;
 }

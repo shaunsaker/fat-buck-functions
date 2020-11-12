@@ -8,9 +8,10 @@ import { toBTCDigits } from '../../utils/toBTCDigits';
 describe('calculateTotalProfit', () => {
   it('returns 0 when there are no transactions', () => {
     const transactions: TransactionData[] = [];
-    const totalProfit = calculateTotalProfit(transactions);
+    const { ratio, amount } = calculateTotalProfit(transactions);
 
-    expect(totalProfit).toEqual(0);
+    expect(ratio).toEqual(0);
+    expect(amount).toEqual(0);
   });
 
   it('returns 0 when there are no trade transactions', () => {
@@ -19,9 +20,10 @@ describe('calculateTotalProfit', () => {
       makeDepositTransaction({}),
       makeDepositTransaction({}),
     ];
-    const totalProfit = calculateTotalProfit(transactions);
+    const { ratio, amount } = calculateTotalProfit(transactions);
 
-    expect(totalProfit).toEqual(0);
+    expect(ratio).toEqual(0);
+    expect(amount).toEqual(0);
   });
 
   it('returns the profit ratio when there are no deposits/withdrawals after the last trade', () => {
@@ -37,13 +39,14 @@ describe('calculateTotalProfit', () => {
       depositTransaction,
       tradeTransaction,
     ];
-    const totalProfit = calculateTotalProfit(transactions);
+    const { ratio, amount } = calculateTotalProfit(transactions);
     const expectedTotalProfit = toBTCDigits(
       tradeTransaction.amount /
         (tradeTransaction.amount + depositTransaction.amount),
     );
 
-    expect(totalProfit).toEqual(expectedTotalProfit);
+    expect(ratio).toEqual(expectedTotalProfit);
+    expect(amount).toEqual(tradeTransaction.amount);
   });
 
   it('returns the profit ratio when there are deposits/withdrawals after the last trade', () => {
@@ -62,12 +65,13 @@ describe('calculateTotalProfit', () => {
         date: latestDate,
       }),
     ];
-    const totalProfit = calculateTotalProfit(transactions);
+    const { ratio, amount } = calculateTotalProfit(transactions);
     const expectedTotalProfit = toBTCDigits(
       tradeTransaction.amount /
         (tradeTransaction.amount + depositTransaction.amount), // NOTE that we exclude the last deposit since it happened after the last trade
     );
 
-    expect(totalProfit).toEqual(expectedTotalProfit);
+    expect(ratio).toEqual(expectedTotalProfit);
+    expect(amount).toEqual(tradeTransaction.amount);
   });
 });
