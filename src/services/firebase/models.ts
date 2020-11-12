@@ -110,6 +110,7 @@ export type TransactionData =
 
 export interface PoolBalanceData {
   amount: number;
+  value: number;
   lastUpdated: string;
 }
 

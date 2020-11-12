@@ -46,6 +46,7 @@ export const getBotsData = async (): Promise<null> => {
     console.log('Saving balance.');
     const poolBalanceData: PoolBalanceData = {
       amount: balance.total,
+      value: balance.value, // ZAR value
       lastUpdated: getDate(),
     };
     await savePoolBalance(poolBalanceData);
