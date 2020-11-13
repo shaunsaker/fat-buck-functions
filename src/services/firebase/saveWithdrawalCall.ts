@@ -3,7 +3,7 @@ import { WithdrawalCallData } from './models';
 
 export const saveWithdrawalCall = async (
   data: WithdrawalCallData,
-  id?: string,
+  id = '',
 ): Promise<void> => {
   await firebase
     .firestore()

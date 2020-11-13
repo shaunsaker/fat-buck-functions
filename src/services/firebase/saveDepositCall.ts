@@ -3,7 +3,7 @@ import { DepositCallData } from './models';
 
 export const saveDepositCall = async (
   data: DepositCallData,
-  id?: string,
+  id = '',
 ): Promise<void> => {
   await firebase
     .firestore()
