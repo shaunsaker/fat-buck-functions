@@ -2,9 +2,14 @@ import * as camelcaseKeys from 'camelcase-keys';
 import { firebase } from '.';
 import { Trades, Trade, ParsedTrades } from '../bots/models';
 import { getDate } from '../../utils/getDate';
-import { TradeTransactionData, TransactionType } from './models';
+import {
+  MessagingTopics,
+  TradeTransactionData,
+  TransactionType,
+} from './models';
 import { saveTransaction } from './saveTransaction';
 import { getTransactionExists } from './getTransactionExists';
+import { sendNotification } from './sendNotification';
 
 const getTradeId = (botId: string, trade: Trade): string => {
   const coin = trade.pair.split('/')[0];
@@ -40,6 +45,8 @@ export const saveTrades = async (
         ...parsedTrade,
         dateAdded: date,
       });
+
+      await sendNotification({ topic: MessagingTopics.openedTrades, trade });
     }
 
     if (existingTrade && !trade.is_open) {
@@ -58,6 +65,8 @@ export const saveTrades = async (
         };
 
         await saveTransaction(tradeTransactionData, tradeId);
+
+        await sendNotification({ topic: MessagingTopics.closedTrades, trade });
       }
     }
   }

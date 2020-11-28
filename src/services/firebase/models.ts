@@ -138,3 +138,13 @@ export interface BotData {
   isActive: boolean;
   isAlive: boolean;
 }
+
+export enum MessagingTopics {
+  openedTrades = 'openedTrades',
+  closedTrades = 'closedTrades',
+}
+
+export interface Message {
+  title: string;
+  body: string;
+}
