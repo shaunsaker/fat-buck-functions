@@ -35,9 +35,12 @@ export const saveTrades = async (
 
   for (const trade of trades) {
     const id = getTradeId(botId, trade);
-    const existingTrade = existingTrades.filter((trade) => trade.id === id)[0];
 
-    if (!existingTrade) {
+    const existingClosedTrade = existingTrades.filter(
+      (trade) => trade.id === id && trade.closeTimestamp,
+    )[0];
+
+    if (!existingClosedTrade) {
       // opened trade
       const parsedTrade = camelcaseKeys(trade);
       await tradesRef.doc(id).set({
@@ -45,21 +48,28 @@ export const saveTrades = async (
         dateAdded: date,
       });
 
-      await sendNotification({ topic: MessagingTopics.openedTrades, trade });
+      // only do this once when the trade has just been opened
+      const existingOpenedTrade = existingTrades.filter(
+        (trade) => trade.id === id && !trade.closeTimestamp,
+      )[0];
+
+      if (!existingOpenedTrade) {
+        await sendNotification({ topic: MessagingTopics.openedTrades, trade });
+      }
     }
 
-    if (existingTrade && !trade.is_open) {
+    if (existingClosedTrade && !trade.is_open) {
       // closed trade
-      const tradeId = existingTrade.id;
+      const tradeId = existingClosedTrade.id;
       const existingTransaction = await getTransactionExists(tradeId);
 
       if (!existingTransaction) {
         const tradeTransactionData: TradeTransactionData = {
           date,
-          amount: existingTrade.closeProfitAbs, // profit/loss
+          amount: existingClosedTrade.closeProfitAbs, // profit/loss
           type: TransactionType.TRADE,
           tradeId,
-          profitRatio: existingTrade.closeProfit,
+          profitRatio: existingClosedTrade.closeProfit,
         };
 
         await saveTransaction(tradeTransactionData, tradeId);
