@@ -20,7 +20,7 @@ export const sendNotification = async ({
     const isProfit = trade.close_profit_abs >= 0;
 
     title = `Fat Buck just sold ${trade.pair}.`;
-    body = `We made a ${getFloatString(trade.close_profit_abs)}% ${
+    body = `We made a ${getFloatString(trade.close_profit * 100)}% ${
       isProfit ? 'profit' : 'loss'
     }!`;
   }
