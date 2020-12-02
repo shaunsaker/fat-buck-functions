@@ -31,8 +31,8 @@ export const processDeposits = async ({
   const unresolvedDeposits = depositHistory.filter((deposit) =>
     depositCalls.some(
       (depositCall) =>
-        depositCall.binanceTransactionId !== deposit.txId ||
-        (depositCall.binanceTransactionId === deposit.txId &&
+        depositCall.txId !== deposit.txId ||
+        (depositCall.txId === deposit.txId &&
           depositCall.status !== DepositStatus.SUCCESS),
     ),
   );
@@ -54,9 +54,9 @@ export const processDeposits = async ({
 
     const newDepositCallData = { ...depositCall };
 
-    // if the status is not success, add the binanceTransactionId
+    // if the status is not success, add the transaction id
     if (deposit.status !== BinanceDepositStatus.SUCCESS) {
-      newDepositCallData.binanceTransactionId = deposit.txId;
+      newDepositCallData.txId = deposit.txId;
     }
 
     // if the status is success, update the deposit call and add the deposit to transactions
@@ -77,7 +77,7 @@ export const processDeposits = async ({
           uid: depositCall.uid,
           walletAddress: depositCall.walletAddress,
           depositCallId: depositCall.id,
-          binanceTransactionId: deposit.txId,
+          txId: deposit.txId,
           date,
           amount: deposit.amount,
           type: TransactionType.DEPOSIT,

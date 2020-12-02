@@ -21,6 +21,6 @@ export const makeDepositTransaction = ({
     uid: getUniqueId(),
     walletAddress: getUniqueId(),
     depositCallId: getUniqueId(),
-    binanceTransactionId: getUniqueId(),
+    txId: getUniqueId(),
   };
 };

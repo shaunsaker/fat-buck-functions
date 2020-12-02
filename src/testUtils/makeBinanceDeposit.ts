@@ -5,7 +5,7 @@ import {
 
 export const makeBinanceDeposit = (
   walletAddress: string,
-  binanceTransactionId: string,
+  txId: string,
   status?: BinanceDepositStatus,
   asset?: string,
 ): BinanceDepositHistory => {
@@ -14,7 +14,7 @@ export const makeBinanceDeposit = (
     amount: 1,
     asset: asset || 'BTC',
     address: walletAddress,
-    txId: binanceTransactionId,
+    txId: txId,
     status: status || BinanceDepositStatus.PENDING,
   };
 };

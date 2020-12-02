@@ -9,12 +9,12 @@ import { getUniqueId } from '../utils/getUniqueId';
 export const makeBinanceWithdrawal = ({
   amount,
   walletAddress,
-  binanceTransactionId,
+  txId,
   status,
 }: {
   amount?: number;
   walletAddress?: string;
-  binanceTransactionId?: string;
+  txId?: string;
   status?: BinanceWithdrawalStatus;
 }): BinanceWithdrawalHistory => {
   return {
@@ -22,7 +22,7 @@ export const makeBinanceWithdrawal = ({
     amount: amount || getRandomNumber(0.1, 0.001),
     asset: 'BTC',
     address: walletAddress || getUniqueId(),
-    txId: binanceTransactionId || getUniqueId(),
+    txId: txId || getUniqueId(),
     status: status || BinanceWithdrawalStatus.EMAIL_SENT,
     transactionFee: BINANCE_WITHDRAWAL_FEE,
   };

@@ -25,7 +25,7 @@ export interface DepositCallData {
   date: string;
   walletAddress: string;
   status: DepositStatus;
-  binanceTransactionId?: string; // added once it has been seen in deposit history
+  txId?: string; // added once it has been seen in deposit history
   resolvedDate?: string; // added once it has resolved (status is SUCCESS)
   message?: string; // used for errors
 }
@@ -48,7 +48,7 @@ export interface WithdrawalCallData {
   walletAddress: string;
   amount: number;
   status: WithdrawalStatus;
-  binanceTransactionId?: string; // added once it has been seen in withdrawal history
+  txId?: string; // added once it has been seen in withdrawal history
   resolvedDate?: string; // added once it has resolved (status is COMPLETED)
   message?: string; // used for errors
 }
@@ -76,7 +76,7 @@ export interface DepositTransactionData extends BaseTransactionData {
   uid: string;
   walletAddress: string;
   depositCallId: string;
-  binanceTransactionId: string;
+  txId: string;
 }
 
 export interface CommissionTransactionData extends BaseTransactionData {
@@ -97,7 +97,7 @@ export interface WithdrawalTransactionData extends BaseTransactionData {
   uid: string;
   walletAddress: string;
   withdrawalCallId: string;
-  binanceTransactionId: string;
+  txId: string;
   transactionFee: number;
   resolvedAmount: number;
 }

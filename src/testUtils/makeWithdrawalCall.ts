@@ -9,12 +9,12 @@ import { getUniqueId } from '../utils/getUniqueId';
 export const makeWithdrawalCall = ({
   amount,
   walletAddress,
-  binanceTransactionId,
+  txId,
   hasSuccess,
 }: {
   amount?: number;
   walletAddress?: string;
-  binanceTransactionId?: string;
+  txId?: string;
   hasSuccess?: boolean;
 }): WithdrawalCallData => {
   return {
@@ -26,7 +26,7 @@ export const makeWithdrawalCall = ({
     status: hasSuccess
       ? WithdrawalStatus.COMPLETED
       : WithdrawalStatus.EMAIL_SENT,
-    binanceTransactionId,
+    txId,
     resolvedDate: hasSuccess ? getDate() : undefined,
   };
 };

@@ -4,7 +4,7 @@ import { getUniqueId } from '../utils/getUniqueId';
 
 export const makeDepositCall = (
   walletAddress?: string,
-  binanceTransactionId?: string,
+  txId?: string,
   hasSuccess?: boolean,
 ): DepositCallData => {
   return {
@@ -13,7 +13,7 @@ export const makeDepositCall = (
     date: getDate(),
     walletAddress: walletAddress || getUniqueId(),
     status: hasSuccess ? DepositStatus.SUCCESS : DepositStatus.PENDING,
-    binanceTransactionId,
+    txId,
     resolvedDate: hasSuccess ? getDate() : undefined,
   };
 };

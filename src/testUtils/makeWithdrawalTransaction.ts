@@ -15,13 +15,13 @@ export const makeWithdrawalTransaction = ({
   amount,
   walletAddress,
   withdrawalCallId,
-  binanceTransactionId,
+  txId,
 }: {
   transactions?: TransactionData[];
   amount?: number;
   walletAddress?: string;
   withdrawalCallId?: string;
-  binanceTransactionId?: string;
+  txId?: string;
 }): WithdrawalTransactionData => {
   // use the existing transactions (if available) to make sure we don't withdraw more than is available
   const availableBalance = transactions
@@ -38,7 +38,7 @@ export const makeWithdrawalTransaction = ({
     uid: getUniqueId(),
     walletAddress: walletAddress || getUniqueId(),
     withdrawalCallId: withdrawalCallId || getUniqueId(),
-    binanceTransactionId: binanceTransactionId || getUniqueId(),
+    txId: txId || getUniqueId(),
     transactionFee: BINANCE_WITHDRAWAL_FEE,
     resolvedAmount,
   };

@@ -31,8 +31,8 @@ export const processWithdrawals = async ({
   const unresolvedWithdrawals = withdrawalHistory.filter((withdrawal) =>
     withdrawalCalls.some(
       (withdrawalCall) =>
-        withdrawalCall.binanceTransactionId !== withdrawal.txId ||
-        (withdrawalCall.binanceTransactionId === withdrawal.txId &&
+        withdrawalCall.txId !== withdrawal.txId ||
+        (withdrawalCall.txId === withdrawal.txId &&
           withdrawalCall.status !== WithdrawalStatus.COMPLETED),
     ),
   );
@@ -55,9 +55,9 @@ export const processWithdrawals = async ({
 
     const newWithdrawalCallData = { ...withdrawalCall };
 
-    // if the status is not completed, add the binanceTransactionId
+    // if the status is not completed, add the txId
     if (withdrawal.status !== BinanceWithdrawalStatus.COMPLETED) {
-      newWithdrawalCallData.binanceTransactionId = withdrawal.txId;
+      newWithdrawalCallData.txId = withdrawal.txId;
     }
 
     // if the status is completed, update the withdrawal call and add the withdrawal to transactions
@@ -71,7 +71,7 @@ export const processWithdrawals = async ({
         uid: withdrawalCall.uid,
         walletAddress: withdrawalCall.walletAddress,
         withdrawalCallId: withdrawalCall.id,
-        binanceTransactionId: withdrawal.txId,
+        txId: withdrawal.txId,
         date,
         amount: withdrawalCall.amount,
         transactionFee: withdrawal.transactionFee,
