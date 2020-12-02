@@ -4,10 +4,12 @@ import { getDepositCalls } from '../../services/firebase/getDepositCalls';
 import {
   DepositStatus,
   DepositTransactionData,
+  MessagingTopics,
   TransactionType,
 } from '../../services/firebase/models';
 import { saveDepositCall } from '../../services/firebase/saveDepositCall';
 import { saveTransaction } from '../../services/firebase/saveTransaction';
+import { sendNotification } from '../../services/firebase/sendNotification';
 import { getDate } from '../../utils/getDate';
 
 export const processDeposits = async ({
@@ -84,6 +86,11 @@ export const processDeposits = async ({
         };
 
         await onSaveTransaction(transaction);
+
+        await sendNotification({
+          topic: MessagingTopics.depositSuccess,
+          data: transaction,
+        });
       }
     }
 

@@ -54,7 +54,10 @@ export const saveTrades = async (
       )[0];
 
       if (!existingOpenedTrade) {
-        await sendNotification({ topic: MessagingTopics.openedTrades, trade });
+        await sendNotification({
+          topic: MessagingTopics.openedTrades,
+          data: trade,
+        });
       }
     }
 
@@ -74,7 +77,10 @@ export const saveTrades = async (
 
         await saveTransaction(tradeTransactionData, tradeId);
 
-        await sendNotification({ topic: MessagingTopics.closedTrades, trade });
+        await sendNotification({
+          topic: MessagingTopics.closedTrades,
+          data: trade,
+        });
       }
     }
   }

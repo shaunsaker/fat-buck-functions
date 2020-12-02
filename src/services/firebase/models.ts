@@ -142,6 +142,7 @@ export interface BotData {
 export enum MessagingTopics {
   openedTrades = 'openedTrades',
   closedTrades = 'closedTrades',
+  depositSuccess = 'depositSuccess',
 }
 
 export interface Message {
