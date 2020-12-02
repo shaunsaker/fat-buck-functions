@@ -5,9 +5,11 @@ export const saveDepositCall = async (
   data: DepositCallData,
   id?: string,
 ): Promise<void> => {
-  await firebase
-    .firestore()
-    .collection('depositCalls')
-    .doc(id)
-    .set(data, { merge: Boolean(id) });
+  const ref = await firebase.firestore().collection('depositCalls');
+
+  if (id) {
+    ref.doc(id).set(data, { merge: true });
+  } else {
+    ref.doc().set(data);
+  }
 };
