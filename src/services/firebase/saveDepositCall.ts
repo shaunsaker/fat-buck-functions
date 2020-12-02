@@ -5,6 +5,7 @@ export const saveDepositCall = async (
   data: DepositCallData,
   id?: string,
 ): Promise<void> => {
+  console.log({ data, id });
   const ref = await firebase.firestore().collection('depositCalls');
 
   if (id) {
