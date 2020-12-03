@@ -7,6 +7,7 @@ import {
   DepositCallData,
   DepositStatus,
   DepositTransactionData,
+  MessagingTopics,
   TransactionType,
 } from '../../services/firebase/models';
 import { getDate } from '../../utils/getDate';
@@ -18,6 +19,7 @@ import { makeDepositCall } from '../../testUtils/makeDepositCall';
 describe('handleDeposits', () => {
   const onSaveTransaction = jest.fn();
   const onSaveDepositCall = jest.fn();
+  const onSendNotification = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -39,12 +41,14 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).not.toHaveBeenCalled();
+    expect(onSendNotification).not.toHaveBeenCalled();
   });
 
   it('works when deposit history is empty but there are deposit calls', async () => {
@@ -67,12 +71,14 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).not.toHaveBeenCalled();
+    expect(onSendNotification).not.toHaveBeenCalled();
   });
 
   it('works with a matching pending deposit', async () => {
@@ -104,6 +110,7 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     const expectedDeposit: DepositCallData = {
@@ -118,6 +125,7 @@ describe('handleDeposits', () => {
       expectedDeposit,
       expectedDeposit.id,
     );
+    expect(onSendNotification).not.toHaveBeenCalled();
   });
 
   it('works with multiple matching pending deposits', async () => {
@@ -154,12 +162,14 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).toHaveBeenCalledTimes(2);
+    expect(onSendNotification).not.toHaveBeenCalled();
   });
 
   it('works with a matching verifying deposit', async () => {
@@ -195,6 +205,7 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
     const expectedDeposit: DepositCallData = {
       ...depositCall,
@@ -208,6 +219,7 @@ describe('handleDeposits', () => {
       expectedDeposit,
       expectedDeposit.id,
     );
+    expect(onSendNotification).not.toHaveBeenCalled();
   });
 
   it('works with a matching success deposit', async () => {
@@ -244,6 +256,7 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     const date = getDate();
@@ -269,6 +282,10 @@ describe('handleDeposits', () => {
       expectedDeposit,
       expectedDeposit.id,
     );
+    expect(onSendNotification).toHaveBeenCalledWith({
+      topic: MessagingTopics.depositSuccess,
+      data: expectedTransaction,
+    });
   });
 
   it('works with multiple matching success deposits', async () => {
@@ -313,12 +330,14 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).toHaveBeenCalledTimes(2);
     expect(onSaveDepositCall).toHaveBeenCalledTimes(2);
+    expect(onSendNotification).toHaveBeenCalledTimes(2);
   });
 
   it('works with already matched successful deposits', async () => {
@@ -355,12 +374,14 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toBeCalled();
     expect(onSaveDepositCall).not.toBeCalled();
+    expect(onSendNotification).not.toBeCalled();
   });
 
   it('works with deposits without matching deposit calls', async () => {
@@ -391,12 +412,14 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toBeCalled();
     expect(onSaveDepositCall).not.toBeCalled();
+    expect(onSendNotification).not.toBeCalled();
   });
 
   it('works with non-matching wallet address', async () => {
@@ -434,12 +457,14 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).not.toBeCalled();
     expect(onSaveDepositCall).not.toBeCalled();
+    expect(onSendNotification).not.toBeCalled();
   });
 
   it('handles non-BTC deposits', async () => {
@@ -478,6 +503,7 @@ describe('handleDeposits', () => {
       onGetDepositCalls,
       onSaveTransaction,
       onSaveDepositCall,
+      onSendNotification,
     });
 
     const expectedDeposit: DepositCallData = {
@@ -494,5 +520,6 @@ describe('handleDeposits', () => {
       expectedDeposit,
       expectedDeposit.id,
     );
+    expect(onSendNotification).not.toBeCalled();
   });
 });

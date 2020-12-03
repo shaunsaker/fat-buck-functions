@@ -17,11 +17,13 @@ export const processDeposits = async ({
   onGetDepositCalls,
   onSaveTransaction,
   onSaveDepositCall,
+  onSendNotification,
 }: {
   onGetDepositHistory: typeof getDepositHistory;
   onGetDepositCalls: typeof getDepositCalls;
   onSaveTransaction: typeof saveTransaction;
   onSaveDepositCall: typeof saveDepositCall;
+  onSendNotification: typeof sendNotification;
 }): Promise<null> => {
   // get the deposit history from binance
   const depositHistory = await onGetDepositHistory();
@@ -87,7 +89,7 @@ export const processDeposits = async ({
 
         await onSaveTransaction(transaction);
 
-        await sendNotification({
+        await onSendNotification({
           topic: MessagingTopics.depositSuccess,
           data: transaction,
         });
@@ -112,6 +114,7 @@ export const handleDeposits = async (): Promise<null> => {
     onGetDepositCalls: getDepositCalls,
     onSaveTransaction: saveTransaction,
     onSaveDepositCall: saveDepositCall,
+    onSendNotification: sendNotification,
   });
 
   return null;
