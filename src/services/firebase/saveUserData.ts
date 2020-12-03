@@ -3,7 +3,7 @@ import { UserData } from './models';
 
 export const saveUserData = async (
   uid: string,
-  data: UserData,
+  data: Partial<UserData>,
 ): Promise<null> => {
   console.log('Saving user data.');
   await firebase

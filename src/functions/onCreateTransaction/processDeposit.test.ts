@@ -10,21 +10,28 @@ import { makeDepositTransaction } from '../../testUtils/makeDepositTransaction';
 import { deductCommission } from '../../utils/deductCommission';
 
 describe('processDeposit', () => {
-  it('works correctly', async () => {
-    const depositAmount = 0.5010101;
-    const data = makeDepositTransaction({ amount: depositAmount });
-    const transactionId = getUniqueId();
-    const currentUserBalance = 0;
-    const currentPoolCommission = 0;
-    const onSaveCommissionTransaction = jest.fn();
-    const onSaveUserTransaction = jest.fn();
-    const onUpdateUserBalance = jest.fn();
-    const onUpdatePoolCommission = jest.fn();
+  const depositAmount = 0.5010101;
+  const data = makeDepositTransaction({ amount: depositAmount });
+  const transactionId = getUniqueId();
+  const currentUserBalance = 0;
+  const currentPoolCommission = 0;
+  const onSaveCommissionTransaction = jest.fn();
+  const onSaveUserTransaction = jest.fn();
+  const onUpdateUserBalance = jest.fn();
+  const onUpdatePoolCommission = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('works correctly when the user is not an admin', async () => {
+    const isUserAdmin = false;
 
     await handleDeposit({
       data,
       transactionId,
       currentUserBalance,
+      isUserAdmin,
       currentPoolCommission,
       onSaveCommissionTransaction,
       onSaveUserTransaction,
@@ -42,10 +49,9 @@ describe('processDeposit', () => {
       uid: data.uid,
     };
 
-    const expectedUserData: UserData = {
+    const expectedUserData: Partial<UserData> = {
       balance: currentUserBalance + newAmount,
       balanceLastUpdated: date,
-      id: data.uid,
     };
 
     const expectedPoolCommissionData: PoolCommissionData = {
@@ -68,5 +74,36 @@ describe('processDeposit', () => {
     expect(onUpdatePoolCommission).toHaveBeenCalledWith(
       expectedPoolCommissionData,
     );
+  });
+
+  it('works correctly when the user is an admin', async () => {
+    const isUserAdmin = true;
+
+    await handleDeposit({
+      data,
+      transactionId,
+      currentUserBalance,
+      isUserAdmin,
+      currentPoolCommission,
+      onSaveCommissionTransaction,
+      onSaveUserTransaction,
+      onUpdateUserBalance,
+      onUpdatePoolCommission,
+    });
+
+    const date = '';
+
+    const expectedUserData: Partial<UserData> = {
+      balance: currentUserBalance + data.amount,
+      balanceLastUpdated: date,
+    };
+
+    expect(onSaveCommissionTransaction).not.toHaveBeenCalled();
+    expect(onSaveUserTransaction).toHaveBeenCalledWith(data.uid, data);
+    expect(onUpdateUserBalance).toHaveBeenCalledWith(
+      data.uid,
+      expectedUserData,
+    );
+    expect(onUpdatePoolCommission).not.toHaveBeenCalled();
   });
 });
