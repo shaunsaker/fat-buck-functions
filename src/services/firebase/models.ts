@@ -118,7 +118,7 @@ export interface UserData {
   balance: number;
   balanceLastUpdated: string;
   id: string;
-  isAdmin: boolean;
+  isAdmin?: boolean;
 }
 
 export interface PoolCommissionData {

@@ -35,10 +35,12 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn();
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
@@ -46,6 +48,7 @@ describe('handleDeposits', () => {
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
+    expect(onGetTxInputWalletAddress).not.toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).not.toHaveBeenCalled();
     expect(onSendNotification).not.toHaveBeenCalled();
@@ -65,10 +68,12 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn();
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
@@ -76,6 +81,7 @@ describe('handleDeposits', () => {
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
+    expect(onGetTxInputWalletAddress).not.toHaveBeenCalled();
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).not.toHaveBeenCalled();
     expect(onSendNotification).not.toHaveBeenCalled();
@@ -85,18 +91,10 @@ describe('handleDeposits', () => {
     const walletAddress = getUniqueId();
     const transactionId = getUniqueId();
     const depositHistory: BinanceDepositList = randomise([
-      makeBinanceDeposit(getUniqueId(), getUniqueId()),
-      makeBinanceDeposit(getUniqueId(), getUniqueId()),
-      makeBinanceDeposit(getUniqueId(), getUniqueId()),
       makeBinanceDeposit(walletAddress, transactionId),
     ]);
     const depositCall = makeDepositCall(walletAddress);
-    const depositCalls: DepositCallData[] = randomise([
-      makeDepositCall(),
-      makeDepositCall(),
-      makeDepositCall(),
-      depositCall,
-    ]);
+    const depositCalls: DepositCallData[] = randomise([depositCall]);
     const onGetDepositHistory = jest.fn(
       () =>
         new Promise<BinanceDepositList>((resolve) => resolve(depositHistory)),
@@ -104,26 +102,31 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn(
+      () => new Promise<string>((resolve) => resolve(walletAddress)),
+    );
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
     });
 
-    const expectedDeposit: DepositCallData = {
+    const expectedDepositCall: DepositCallData = {
       ...depositCall,
       txId: transactionId,
     };
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
+    expect(onGetTxInputWalletAddress).toHaveBeenCalledWith(transactionId);
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).toHaveBeenCalledWith(
-      expectedDeposit,
-      expectedDeposit.id,
+      expectedDepositCall,
+      expectedDepositCall.id,
     );
     expect(onSendNotification).not.toHaveBeenCalled();
   });
@@ -156,10 +159,14 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn(
+      () => new Promise<string>((resolve) => resolve(walletAddress1)),
+    );
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
@@ -167,8 +174,10 @@ describe('handleDeposits', () => {
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
+    expect(onGetTxInputWalletAddress).toHaveBeenCalledWith(transactionId1);
+    expect(onGetTxInputWalletAddress).toHaveBeenCalledWith(transactionId2);
     expect(onSaveTransaction).not.toHaveBeenCalled();
-    expect(onSaveDepositCall).toHaveBeenCalledTimes(2);
+    expect(onSaveDepositCall).toHaveBeenCalledTimes(5);
     expect(onSendNotification).not.toHaveBeenCalled();
   });
 
@@ -199,10 +208,14 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn(
+      () => new Promise<string>((resolve) => resolve(walletAddress)),
+    );
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
@@ -214,6 +227,7 @@ describe('handleDeposits', () => {
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
+    expect(onGetTxInputWalletAddress).toHaveBeenCalledWith(transactionId);
     expect(onSaveTransaction).not.toHaveBeenCalled();
     expect(onSaveDepositCall).toHaveBeenCalledWith(
       expectedDeposit,
@@ -250,10 +264,14 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn(
+      () => new Promise<string>((resolve) => resolve(walletAddress)),
+    );
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
@@ -277,6 +295,7 @@ describe('handleDeposits', () => {
 
     expect(onGetDepositHistory).toHaveBeenCalled();
     expect(onGetDepositCalls).toHaveBeenCalled();
+    expect(onGetTxInputWalletAddress).toHaveBeenCalledWith(transactionId);
     expect(onSaveTransaction).toHaveBeenCalledWith(expectedTransaction);
     expect(onSaveDepositCall).toHaveBeenCalledWith(
       expectedDeposit,
@@ -324,19 +343,22 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn(
+      () => new Promise<string>((resolve) => resolve(walletAddress1)),
+    );
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
     });
 
     expect(onGetDepositHistory).toHaveBeenCalled();
-    expect(onGetDepositCalls).toHaveBeenCalled();
     expect(onSaveTransaction).toHaveBeenCalledTimes(2);
-    expect(onSaveDepositCall).toHaveBeenCalledTimes(2);
+    expect(onSaveDepositCall).toHaveBeenCalledTimes(5);
     expect(onSendNotification).toHaveBeenCalledTimes(2);
   });
 
@@ -368,10 +390,14 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn(
+      () => new Promise<string>((resolve) => resolve(walletAddress)),
+    );
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
@@ -406,10 +432,14 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn(
+      () => new Promise<string>((resolve) => resolve(walletAddress)),
+    );
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
@@ -451,10 +481,14 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn(
+      () => new Promise<string>((resolve) => resolve(walletAddress)),
+    );
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,
@@ -497,10 +531,14 @@ describe('handleDeposits', () => {
     const onGetDepositCalls = jest.fn(
       () => new Promise<DepositCallData[]>((resolve) => resolve(depositCalls)),
     );
+    const onGetTxInputWalletAddress = jest.fn(
+      () => new Promise<string>((resolve) => resolve(walletAddress)),
+    );
 
     await processDeposits({
       onGetDepositHistory,
       onGetDepositCalls,
+      onGetTxInputWalletAddress,
       onSaveTransaction,
       onSaveDepositCall,
       onSendNotification,

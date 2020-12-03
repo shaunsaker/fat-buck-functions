@@ -10,7 +10,6 @@ export const makeBinanceDeposit = (
   asset?: string,
 ): BinanceDepositHistory => {
   return {
-    insertTime: Date.now(),
     amount: 1,
     asset: asset || 'BTC',
     address: walletAddress,

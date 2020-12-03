@@ -1,4 +1,5 @@
-import { getUserBalance } from '../../services/firebase/getUserBalance';
+import { getUserData } from '../../services/firebase/getUserData';
+import { UserData } from '../../services/firebase/models';
 import { saveUserData } from '../../services/firebase/saveUserData';
 import { makeWithdrawalTransaction } from '../../testUtils/makeWithdrawalTransaction';
 import { getDate } from '../../utils/getDate';
@@ -17,7 +18,7 @@ describe('processWithdrawal', () => {
 
       expect(onUpdateUserBalance).toHaveBeenCalledWith({
         data,
-        onGetUserBalance: getUserBalance,
+        onGetUserData: getUserData,
         onSaveUserData: saveUserData,
       });
     });
@@ -29,18 +30,21 @@ describe('processWithdrawal', () => {
       const data = makeWithdrawalTransaction({
         amount: 0.5, // less than user balance
       });
-      const onGetUserBalance = jest.fn(
-        () => new Promise<number>((resolve) => resolve(userBalance)),
+      const onGetUserData = jest.fn(
+        () =>
+          new Promise<UserData>((resolve) =>
+            resolve({ balance: userBalance, balanceLastUpdated: '', id: '' }),
+          ),
       );
       const onSaveUserData = jest.fn();
 
       await handleUpdateUserBalance({
         data,
-        onGetUserBalance,
+        onGetUserData,
         onSaveUserData,
       });
 
-      expect(onGetUserBalance).toHaveBeenCalled();
+      expect(onGetUserData).toHaveBeenCalled();
       expect(onSaveUserData).toHaveBeenCalledWith(data.uid, {
         balance: userBalance - data.amount,
         balanceLastUpdated: getDate(),

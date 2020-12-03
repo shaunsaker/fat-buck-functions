@@ -11,17 +11,17 @@ import {
   WithdrawalStatus,
 } from '../../services/firebase/models';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { getUserBalance } from '../../services/firebase/getUserBalance';
+import { getUserData } from '../../services/firebase/getUserData';
 
 export const createWithdrawalCall = async ({
   data,
   context,
-  onGetUserBalance,
+  onGetUserData,
   onSaveWithdrawalCall,
 }: {
   data: WithdrawalCallArgs;
   context: CallableContext;
-  onGetUserBalance: typeof getUserBalance;
+  onGetUserData: typeof getUserData;
   onSaveWithdrawalCall: typeof saveWithdrawalCall;
 }): Promise<CallResponse> => {
   const uid = context.auth?.uid;
@@ -43,7 +43,7 @@ export const createWithdrawalCall = async ({
   }
 
   // check if the user's balance is >= withdrawal amount
-  const userBalance = await onGetUserBalance(uid);
+  const { balance: userBalance } = await onGetUserData(uid);
   const { amount } = data;
 
   if (userBalance < amount) {
@@ -74,7 +74,7 @@ export const onCreateWithdrawalCall = functions.https.onCall(
     createWithdrawalCall({
       data,
       context,
-      onGetUserBalance: getUserBalance,
+      onGetUserData: getUserData,
       onSaveWithdrawalCall: saveWithdrawalCall,
     }),
 );

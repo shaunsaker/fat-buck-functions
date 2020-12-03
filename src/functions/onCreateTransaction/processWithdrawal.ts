@@ -1,4 +1,4 @@
-import { getUserBalance } from '../../services/firebase/getUserBalance';
+import { getUserData } from '../../services/firebase/getUserData';
 import {
   UserData,
   WithdrawalTransactionData,
@@ -8,16 +8,16 @@ import { getDate } from '../../utils/getDate';
 
 export const handleUpdateUserBalance = async ({
   data,
-  onGetUserBalance,
+  onGetUserData,
   onSaveUserData,
 }: {
   data: WithdrawalTransactionData;
-  onGetUserBalance: typeof getUserBalance;
+  onGetUserData: typeof getUserData;
   onSaveUserData: typeof saveUserData;
 }): Promise<null> => {
   // get the current user balance
   const { uid } = data;
-  const userBalance = await onGetUserBalance(uid);
+  const { balance: userBalance } = await onGetUserData(uid);
 
   // subtract the withdrawal amount from the user balance
   // CFO: we don't include the transaction fee and resolved amount, should we save two transactions to include these instead?
@@ -44,7 +44,7 @@ export const handleWithdrawal = async ({
   // update the user balance
   await onUpdateUserBalance({
     data,
-    onGetUserBalance: getUserBalance,
+    onGetUserData: getUserData,
     onSaveUserData: saveUserData,
   });
 

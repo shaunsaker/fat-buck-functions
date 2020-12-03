@@ -16,12 +16,14 @@ import { getDate } from '../../utils/getDate';
 export const processDeposits = async ({
   onGetDepositHistory,
   onGetDepositCalls,
+  onGetTxInputWalletAddress,
   onSaveTransaction,
   onSaveDepositCall,
   onSendNotification,
 }: {
   onGetDepositHistory: typeof getDepositHistory;
   onGetDepositCalls: typeof getDepositCalls;
+  onGetTxInputWalletAddress: typeof getTxInputWalletAddress;
   onSaveTransaction: typeof saveTransaction;
   onSaveDepositCall: typeof saveDepositCall;
   onSendNotification: typeof sendNotification;
@@ -45,7 +47,7 @@ export const processDeposits = async ({
   // attach the input wallet address to each unresolved deposit
   // so that we can compare it to the deposit call's wallet address below
   for (const unresolvedDeposit of unresolvedDeposits) {
-    const inputWalletAddress = await getTxInputWalletAddress(
+    const inputWalletAddress = await onGetTxInputWalletAddress(
       unresolvedDeposit.txId,
     );
     unresolvedDeposit['inputAddress'] = inputWalletAddress; // at this point is does not yet exist so we create a new field
@@ -68,11 +70,13 @@ export const processDeposits = async ({
 
     const newDepositCallData = { ...depositCall };
 
-    // attach the txId
-    newDepositCallData.txId = deposit.txId;
+    if (deposit.status !== BinanceDepositStatus.SUCCESS) {
+      // attach the txId
+      newDepositCallData.txId = deposit.txId;
+    }
 
     // if the status is success, update the deposit call and add the deposit to transactions
-    if (deposit.status === BinanceDepositStatus.SUCCESS) {
+    else {
       // check if the asset is BTC, if not don't process it but save it as an error
       if (deposit.asset !== 'BTC') {
         newDepositCallData.status = DepositStatus.ERROR;
@@ -104,11 +108,6 @@ export const processDeposits = async ({
       }
     }
 
-    // should not happen
-    else {
-      throw new Error('Encountered deposit in unknown state.');
-    }
-
     // save the updated deposit call
     await onSaveDepositCall(newDepositCallData, newDepositCallData.id);
   }
@@ -120,6 +119,7 @@ export const handleDeposits = async (): Promise<null> => {
   await processDeposits({
     onGetDepositHistory: getDepositHistory,
     onGetDepositCalls: getDepositCalls,
+    onGetTxInputWalletAddress: getTxInputWalletAddress,
     onSaveTransaction: saveTransaction,
     onSaveDepositCall: saveDepositCall,
     onSendNotification: sendNotification,

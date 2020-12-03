@@ -1,7 +1,7 @@
 import { firebase } from '.';
 import { UserData } from './models';
 
-export const getUsersWithBalances = async (): Promise<UserData[]> => {
+export const getUsersWithBalances = async (): Promise<Partial<UserData>[]> => {
   const usersWithBalances = await (
     await firebase
       .firestore()
@@ -10,7 +10,7 @@ export const getUsersWithBalances = async (): Promise<UserData[]> => {
       .get()
   ).docs.map((doc) => {
     return {
-      ...(doc.data() as UserData),
+      ...(doc.data() as Partial<UserData>),
       id: doc.id,
     };
   });

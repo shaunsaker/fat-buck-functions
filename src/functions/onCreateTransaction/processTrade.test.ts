@@ -189,13 +189,14 @@ describe('processTrade', () => {
       );
       const userBalance = 0.001;
       const uid = getUniqueId();
-      const userData: UserData = {
+      const userData: Partial<UserData> = {
         balance: userBalance,
         balanceLastUpdated: getDate(),
         id: uid,
       };
       const onGetUsersWithBalances = jest.fn(
-        () => new Promise<UserData[]>((resolve) => resolve([userData])),
+        () =>
+          new Promise<Partial<UserData>[]>((resolve) => resolve([userData])),
       );
       const onSaveUserTransaction = jest.fn();
       const onSaveUserData = jest.fn();

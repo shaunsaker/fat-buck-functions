@@ -4,6 +4,7 @@ import {
   INSUFFICIENT_FUNDS_ERROR_MESSAGE,
   NO_UID_ERROR_MESSAGE,
   NO_WALLET_ADDRESS_ERROR_MESSAGE,
+  UserData,
   WithdrawalCallData,
   WithdrawalStatus,
 } from '../../services/firebase/models';
@@ -17,14 +18,17 @@ describe('createWithdrawalCall', () => {
 
     // we don't care what's in here, just that uid is not present
     const context = {} as CallableContext;
-    const getUserBalance = jest.fn(
-      () => new Promise<number>((resolve) => resolve(2)),
+    const getUserData = jest.fn(
+      () =>
+        new Promise<UserData>((resolve) =>
+          resolve({ balance: 2, balanceLastUpdated: '', id: '' }),
+        ),
     );
     const saveWithdrawalCall = jest.fn();
     const result = await createWithdrawalCall({
       data,
       context,
-      onGetUserBalance: getUserBalance,
+      onGetUserData: getUserData,
       onSaveWithdrawalCall: saveWithdrawalCall,
     });
 
@@ -43,14 +47,17 @@ describe('createWithdrawalCall', () => {
         uid: '12345678',
       },
     } as CallableContext;
-    const getUserBalance = jest.fn(
-      () => new Promise<number>((resolve) => resolve(2)),
+    const getUserData = jest.fn(
+      () =>
+        new Promise<UserData>((resolve) =>
+          resolve({ balance: 2, balanceLastUpdated: '', id: '' }),
+        ),
     );
     const saveWithdrawalCall = jest.fn();
     const result = await createWithdrawalCall({
       data,
       context,
-      onGetUserBalance: getUserBalance,
+      onGetUserData: getUserData,
       onSaveWithdrawalCall: saveWithdrawalCall,
     });
 
@@ -70,14 +77,17 @@ describe('createWithdrawalCall', () => {
       },
     } as CallableContext;
     const userBalance = 0.5; // anything lower than data.amount
-    const getUserBalance = jest.fn(
-      () => new Promise<number>((resolve) => resolve(userBalance)),
+    const getUserData = jest.fn(
+      () =>
+        new Promise<UserData>((resolve) =>
+          resolve({ balance: userBalance, balanceLastUpdated: '', id: '' }),
+        ),
     );
     const saveWithdrawalCall = jest.fn();
     const result = await createWithdrawalCall({
       data,
       context,
-      onGetUserBalance: getUserBalance,
+      onGetUserData: getUserData,
       onSaveWithdrawalCall: saveWithdrawalCall,
     });
 
@@ -100,14 +110,17 @@ describe('createWithdrawalCall', () => {
       },
     } as CallableContext;
     const userBalance = 5; // anything higher than data.amount
-    const getUserBalance = jest.fn(
-      () => new Promise<number>((resolve) => resolve(userBalance)),
+    const getUserData = jest.fn(
+      () =>
+        new Promise<UserData>((resolve) =>
+          resolve({ balance: userBalance, balanceLastUpdated: '', id: '' }),
+        ),
     );
     const saveWithdrawalCall = jest.fn();
     const result = await createWithdrawalCall({
       data,
       context,
-      onGetUserBalance: getUserBalance,
+      onGetUserData: getUserData,
       onSaveWithdrawalCall: saveWithdrawalCall,
     });
     const expectedDepositCallData: WithdrawalCallData = {
