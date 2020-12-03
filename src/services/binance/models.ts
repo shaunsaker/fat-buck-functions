@@ -5,12 +5,12 @@ export enum BinanceDepositStatus {
 }
 
 export interface BinanceDepositHistory {
-  insertTime: number;
   amount: number;
   asset: string;
-  address: string;
   txId: string;
   status: BinanceDepositStatus;
+  address: string;
+  inputAddress?: string; // input address attached later by blockchain lookup
 }
 
 export type BinanceDepositList = BinanceDepositHistory[];

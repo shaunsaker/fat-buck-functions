@@ -5,11 +5,13 @@ export const saveTransaction = async (
   transaction: TransactionData,
   transactionId?: string,
 ): Promise<null> => {
-  await firebase
-    .firestore()
-    .collection('transactions')
-    .doc(transactionId)
-    .set(transaction);
+  const ref = firebase.firestore().collection('transactions');
+
+  if (!transactionId) {
+    await ref.doc().set(transaction);
+  } else {
+    await ref.doc(transactionId).set(transaction);
+  }
 
   return null;
 };

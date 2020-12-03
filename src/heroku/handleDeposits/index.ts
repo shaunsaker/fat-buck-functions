@@ -1,5 +1,6 @@
 import { getDepositHistory } from '../../services/binance/getDepositHistory';
 import { BinanceDepositStatus } from '../../services/binance/models';
+import { getTxInputWalletAddress } from '../../services/blockCypher/getTxInputWalletAddress';
 import { getDepositCalls } from '../../services/firebase/getDepositCalls';
 import {
   DepositStatus,
@@ -41,6 +42,15 @@ export const processDeposits = async ({
     ),
   );
 
+  // attach the input wallet address to each unresolved deposit
+  // so that we can compare it to the deposit call's wallet address below
+  for (const unresolvedDeposit of unresolvedDeposits) {
+    const inputWalletAddress = await getTxInputWalletAddress(
+      unresolvedDeposit.txId,
+    );
+    unresolvedDeposit['inputAddress'] = inputWalletAddress; // at this point is does not yet exist so we create a new field
+  }
+
   // filter out the deposit calls that have already resolved
   const unresolvedDepositCalls = depositCalls.filter(
     (depositCall) => depositCall.status !== DepositStatus.SUCCESS,
@@ -49,7 +59,7 @@ export const processDeposits = async ({
   // for any deposits, check if there is an unresolved deposit call that matches the walletAddress
   for (const deposit of unresolvedDeposits) {
     const depositCall = unresolvedDepositCalls.filter(
-      (depositCall) => depositCall.walletAddress === deposit.address,
+      (depositCall) => depositCall.walletAddress === deposit.inputAddress,
     )[0];
 
     if (!depositCall) {
@@ -58,13 +68,11 @@ export const processDeposits = async ({
 
     const newDepositCallData = { ...depositCall };
 
-    // if the status is not success, add the transaction id
-    if (deposit.status !== BinanceDepositStatus.SUCCESS) {
-      newDepositCallData.txId = deposit.txId;
-    }
+    // attach the txId
+    newDepositCallData.txId = deposit.txId;
 
     // if the status is success, update the deposit call and add the deposit to transactions
-    else if (deposit.status === BinanceDepositStatus.SUCCESS) {
+    if (deposit.status === BinanceDepositStatus.SUCCESS) {
       // check if the asset is BTC, if not don't process it but save it as an error
       if (deposit.asset !== 'BTC') {
         newDepositCallData.status = DepositStatus.ERROR;
