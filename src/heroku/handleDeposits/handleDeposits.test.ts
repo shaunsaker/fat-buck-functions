@@ -108,7 +108,7 @@ describe('handleDeposits', () => {
 
     const expectedDeposit: DepositCallData = {
       ...depositCall,
-      binanceTransactionId: transactionId,
+      txId: transactionId,
     };
 
     expect(onGetDepositHistory).toHaveBeenCalled();
@@ -198,7 +198,7 @@ describe('handleDeposits', () => {
     });
     const expectedDeposit: DepositCallData = {
       ...depositCall,
-      binanceTransactionId: transactionId,
+      txId: transactionId,
     };
 
     expect(onGetDepositHistory).toHaveBeenCalled();
@@ -251,7 +251,7 @@ describe('handleDeposits', () => {
       uid: depositCall.uid,
       walletAddress: depositCall.walletAddress,
       depositCallId: depositCall.id,
-      binanceTransactionId: transactionId,
+      txId: transactionId,
       date,
       amount: deposit.amount,
       type: TransactionType.DEPOSIT,
@@ -484,7 +484,7 @@ describe('handleDeposits', () => {
       ...depositCall,
       status: DepositStatus.ERROR,
       message: `We do not support ${notBTC} deposits. Your deposit will be returned to your wallet address, ${walletAddress}.`,
-      binanceTransactionId: transactionId,
+      txId: transactionId,
     };
 
     expect(onGetDepositHistory).toHaveBeenCalled();

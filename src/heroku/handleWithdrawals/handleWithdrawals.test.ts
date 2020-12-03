@@ -88,12 +88,12 @@ describe('handleWithdrawals', () => {
 
   it('works with a matching pending withdrawal', async () => {
     const walletAddress = getUniqueId();
-    const binanceTransactionId = getUniqueId();
+    const txId = getUniqueId();
     const withdrawalHistory: BinanceWithdrawalList = randomise([
       makeBinanceWithdrawal({}),
       makeBinanceWithdrawal({}),
       makeBinanceWithdrawal({}),
-      makeBinanceWithdrawal({ walletAddress, binanceTransactionId }),
+      makeBinanceWithdrawal({ walletAddress, txId }),
     ]);
     const withdrawalCall = makeWithdrawalCall({ walletAddress });
     const withdrawalCalls: WithdrawalCallData[] = randomise([
@@ -124,7 +124,7 @@ describe('handleWithdrawals', () => {
 
     const expectedWithdrawal: WithdrawalCallData = {
       ...withdrawalCall,
-      binanceTransactionId,
+      txId,
     };
 
     expect(onGetWithdrawalHistory).toHaveBeenCalled();
@@ -147,11 +147,11 @@ describe('handleWithdrawals', () => {
       makeBinanceWithdrawal({}),
       makeBinanceWithdrawal({
         walletAddress: walletAddress1,
-        binanceTransactionId: transactionId1,
+        txId: transactionId1,
       }),
       makeBinanceWithdrawal({
         walletAddress: walletAddress2,
-        binanceTransactionId: transactionId2,
+        txId: transactionId2,
       }),
     ]);
     const withdrawalCall1 = makeWithdrawalCall({
@@ -201,7 +201,7 @@ describe('handleWithdrawals', () => {
     const withdrawal = makeBinanceWithdrawal({
       amount: expectedResolvedAmount,
       walletAddress,
-      binanceTransactionId: transactionId,
+      txId: transactionId,
       status: BinanceWithdrawalStatus.COMPLETED,
     });
     const withdrawalHistory: BinanceWithdrawalList = randomise([
@@ -213,7 +213,7 @@ describe('handleWithdrawals', () => {
     const withdrawalCall = makeWithdrawalCall({
       amount,
       walletAddress,
-      binanceTransactionId: transactionId,
+      txId: transactionId,
     });
     const withdrawalCalls: WithdrawalCallData[] = [
       makeWithdrawalCall({}),
@@ -246,7 +246,7 @@ describe('handleWithdrawals', () => {
       uid: withdrawalCall.uid,
       walletAddress: withdrawalCall.walletAddress,
       withdrawalCallId: withdrawalCall.id,
-      binanceTransactionId: transactionId,
+      txId: transactionId,
       date,
       amount: withdrawalCall.amount,
       type: TransactionType.WITHDRAWAL,
@@ -279,22 +279,22 @@ describe('handleWithdrawals', () => {
       makeBinanceWithdrawal({}),
       makeBinanceWithdrawal({
         walletAddress: walletAddress1,
-        binanceTransactionId: transactionId1,
+        txId: transactionId1,
         status: BinanceWithdrawalStatus.COMPLETED,
       }),
       makeBinanceWithdrawal({
         walletAddress: walletAddress2,
-        binanceTransactionId: transactionId2,
+        txId: transactionId2,
         status: BinanceWithdrawalStatus.COMPLETED,
       }),
     ]);
     const withdrawalCall1 = makeWithdrawalCall({
       walletAddress: walletAddress1,
-      binanceTransactionId: transactionId1,
+      txId: transactionId1,
     });
     const withdrawalCall2 = makeWithdrawalCall({
       walletAddress: walletAddress2,
-      binanceTransactionId: transactionId2,
+      txId: transactionId2,
     });
     const withdrawalCalls: WithdrawalCallData[] = randomise([
       makeWithdrawalCall({}),
@@ -331,10 +331,10 @@ describe('handleWithdrawals', () => {
 
   it('works with already matched successful withdrawals', async () => {
     const walletAddress = getUniqueId();
-    const binanceTransactionId = getUniqueId();
+    const txId = getUniqueId();
     const withdrawal = makeBinanceWithdrawal({
       walletAddress,
-      binanceTransactionId,
+      txId,
       status: BinanceWithdrawalStatus.COMPLETED,
     });
     const withdrawalHistory: BinanceWithdrawalList = randomise([
@@ -345,7 +345,7 @@ describe('handleWithdrawals', () => {
     ]);
     const withdrawalCall = makeWithdrawalCall({
       walletAddress,
-      binanceTransactionId,
+      txId,
       hasSuccess: true,
     });
     const withdrawalCalls: WithdrawalCallData[] = randomise([
@@ -382,10 +382,10 @@ describe('handleWithdrawals', () => {
 
   it('works with withdrawals without matching withdrawal calls', async () => {
     const walletAddress = getUniqueId();
-    const binanceTransactionId = getUniqueId();
+    const txId = getUniqueId();
     const withdrawal = makeBinanceWithdrawal({
       walletAddress,
-      binanceTransactionId,
+      txId,
       status: BinanceWithdrawalStatus.COMPLETED,
     });
     const withdrawalHistory: BinanceWithdrawalList = randomise([
@@ -423,10 +423,10 @@ describe('handleWithdrawals', () => {
 
   it('works with non-matching wallet address', async () => {
     const walletAddress = getUniqueId();
-    const binanceTransactionId = getUniqueId();
+    const txId = getUniqueId();
     const withdrawal = makeBinanceWithdrawal({
       walletAddress,
-      binanceTransactionId,
+      txId,
       status: BinanceWithdrawalStatus.COMPLETED,
     });
     const withdrawalHistory: BinanceWithdrawalList = randomise([
