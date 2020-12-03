@@ -12,13 +12,13 @@ import { handleWithdrawals } from './handleWithdrawals';
 const main = async () => {
   console.log('Starting.');
 
-  // await getBotsData();
+  await getBotsData();
 
-  // await getExchangeData();
+  await getExchangeData();
 
   await handleDeposits();
 
-  // await handleWithdrawals();
+  await handleWithdrawals();
 
   console.log('Done.');
   process.exit();
