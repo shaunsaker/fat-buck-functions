@@ -17,6 +17,6 @@ export const makeTradeTransaction = ({
     amount: toBTCDigits(getRandomNumber(-0.001, 0.001)),
     type: TransactionType.TRADE,
     tradeId: getUniqueId(),
-    profitRatio: getRandomNumber(-0.49, 0.49),
+    profitRatio: toBTCDigits(getRandomNumber(-0.49, 0.49)),
   };
 };

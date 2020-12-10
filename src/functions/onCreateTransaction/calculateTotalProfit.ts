@@ -1,10 +1,8 @@
 import {
+  TradeTransactionData,
   TransactionData,
   TransactionType,
 } from '../../services/firebase/models';
-import { getBalanceFromTransactions } from '../../utils/getBalanceFromTransactions';
-import { sortArrayOfObjectsByKey } from '../../utils/sortArrayOfObjectsByKey';
-import { toBTCDigits } from '../../utils/toBTCDigits';
 
 export const calculateTotalProfit = (
   transactions: TransactionData[],
@@ -21,7 +19,7 @@ export const calculateTotalProfit = (
 
   const trades = transactions.filter(
     (transaction) => transaction.type === TransactionType.TRADE,
-  );
+  ) as TradeTransactionData[];
 
   if (!trades.length) {
     return {
@@ -30,26 +28,12 @@ export const calculateTotalProfit = (
     };
   }
 
-  const lastestTradeDate = sortArrayOfObjectsByKey(trades, 'date', true)[0]
-    .date;
-  const transactionsUntilLatestTradeDate = transactions.filter(
-    (transaction) => transaction.date <= lastestTradeDate,
+  const ratioSum = trades.reduce(
+    (total, next) => (total += next.profitRatio),
+    0,
   );
-  const poolBalanceAtLatestTradeDate = getBalanceFromTransactions(
-    transactionsUntilLatestTradeDate,
-  );
-
-  // profit = poolBalance + (withdrawals - deposits)(until date of last trade)
-  const totalDeposits = transactionsUntilLatestTradeDate
-    .filter((transaction) => transaction.type === TransactionType.DEPOSIT)
-    .reduce((total, next) => total + next.amount, 0);
-  const totalWithdrawals = transactionsUntilLatestTradeDate
-    .filter((transaction) => transaction.type === TransactionType.WITHDRAWAL)
-    .reduce((total, next) => total + next.amount, 0);
-  const profit = toBTCDigits(
-    poolBalanceAtLatestTradeDate + totalWithdrawals - totalDeposits,
-  );
-  const ratio = toBTCDigits(profit / poolBalanceAtLatestTradeDate);
+  const ratio = ratioSum / trades.length;
+  const profit = trades.reduce((total, next) => (total += next.amount), 0);
 
   return {
     ratio,
