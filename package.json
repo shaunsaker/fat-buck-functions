@@ -13,7 +13,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "tsc -p tsconfig.release.json",
-    "deploy:functions": "firebase deploy --only functions",
+    "deploy:functions": "yarn firebase deploy --only functions",
     "deploy:heroku": "git push heroku master",
     "deploy": "yarn deploy:functions && yarn deploy:heroku"
   },
@@ -42,6 +42,7 @@
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-jest": "^24.1.0",
     "firebase-functions-test": "^0.1.6",
+    "firebase-tools": "^8.18.1",
     "jest": "^26.5.2",
     "prettier": "^2.1.2",
     "ts-jest": "^26.4.1",
