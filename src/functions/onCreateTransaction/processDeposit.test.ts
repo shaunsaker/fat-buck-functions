@@ -62,10 +62,10 @@ describe('processDeposit', () => {
     expect(onSaveCommissionTransaction).toHaveBeenCalledWith(
       expectedCommissionData,
     );
-    expect(onSaveUserTransaction).toHaveBeenCalledWith(
-      data.uid,
-      expectedCommissionData,
-    );
+    expect(onSaveUserTransaction).toHaveBeenCalledWith(data.uid, {
+      ...expectedCommissionData,
+      amount: expectedCommissionData.amount * -1,
+    });
     expect(onSaveUserTransaction).toHaveBeenCalledWith(data.uid, data);
     expect(onUpdateUserBalance).toHaveBeenCalledWith(
       data.uid,

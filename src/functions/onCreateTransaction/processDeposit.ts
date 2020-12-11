@@ -57,7 +57,10 @@ export const handleDeposit = async ({
     await onSaveCommissionTransaction(commissionData);
 
     // save the same commission transaction to the user's transactions
-    await onSaveUserTransaction(uid, commissionData);
+    // the commission is negative in this case
+    const newCommissionData = { ...commissionData };
+    newCommissionData.amount = commissionData.amount * -1;
+    await onSaveUserTransaction(uid, newCommissionData);
 
     // update the pool balance
     const newPoolBalance = currentPoolCommission + commission;
