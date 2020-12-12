@@ -28,11 +28,7 @@ export const calculateTotalProfit = (
     };
   }
 
-  const ratioSum = trades.reduce(
-    (total, next) => (total += next.profitRatio),
-    0,
-  );
-  const ratio = ratioSum / trades.length;
+  const ratio = trades.reduce((total, next) => (total += next.profitRatio), 0);
   const profit = trades.reduce((total, next) => (total += next.amount), 0);
 
   return {
