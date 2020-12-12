@@ -10,6 +10,7 @@ export interface Trade {
   sell_reason: string;
   trade_id: string;
   id: string;
+  fee_open_cost: number;
 }
 
 export type Trades = Trade[];

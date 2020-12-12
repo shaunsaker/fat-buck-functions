@@ -40,8 +40,10 @@ export const saveTrades = async (
       (trade) => trade.id === id && trade.closeTimestamp,
     )[0];
 
-    if (!existingClosedTrade) {
-      // opened trade
+    const tradeIsNotOrder = trade.fee_open_cost;
+
+    if (!existingClosedTrade && tradeIsNotOrder) {
+      // opened trade that has been opened (we don't care about orders)
       const parsedTrade = camelcaseKeys(trade);
       await tradesRef.doc(id).set({
         ...parsedTrade,
